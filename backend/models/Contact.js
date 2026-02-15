@@ -30,6 +30,10 @@ const Contact = sequelize.define('Contact', {
         type: DataTypes.TEXT,
         allowNull: false,
     },
+    isRead: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    },
     createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
