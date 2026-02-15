@@ -1,13 +1,28 @@
+import { useEffect, useState } from 'react';
 import { Search, Trash2, MoreVertical } from 'lucide-react';
+import { api, Message } from '../../services/api';
 
 export default function Messages() {
-    const messages = [
-        { id: 1, name: "John Doe", email: "john@example.com", subject: "Partnership Inquiry", date: "2 mins ago", isRead: false },
-        { id: 2, name: "Sarah Smith", email: "sarah@design.co", subject: "Project Quote Request", date: "1 hour ago", isRead: false },
-        { id: 3, name: "Mike Johnson", email: "mike@techcorp.com", subject: "Re: Campaign Proposal", date: "Yesterday", isRead: true },
-        { id: 4, name: "Emily Davis", email: "emily@startuplab.io", subject: "Consultation needed", date: "2 days ago", isRead: true },
-        { id: 5, name: "David Wilson", email: "david@wilsongroup.com", subject: "Feedback on recent work", date: "3 days ago", isRead: true },
-    ];
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const loadMessages = async () => {
+            try {
+                const data = await api.fetchMessages();
+                setMessages(data);
+            } catch (error) {
+                console.error("Failed to load messages", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadMessages();
+    }, []);
+
+    if (loading) {
+        return <div className="p-8 text-center text-white/50">Loading messages...</div>;
+    }
 
     return (
         <div className="space-y-8 h-[calc(100vh-8rem)] flex flex-col">
@@ -41,7 +56,7 @@ export default function Messages() {
 
                 {/* Message List */}
                 <div className="flex-1 overflow-y-auto">
-                    {messages.map((msg) => (
+                    {messages?.map((msg) => (
                         <div
                             key={msg.id}
                             className={`flex items-center gap-4 p-4 border-b border-white/5 hover:bg-white/[0.02] cursor-pointer transition-colors ${!msg.isRead ? 'bg-[#29ABE2]/5' : ''}`}
@@ -58,7 +73,7 @@ export default function Messages() {
                                     <span className="font-medium">{msg.subject}</span>
                                     <span className="hidden md:inline text-white/20">-</span>
                                     <span className="text-sm text-white/40 truncate">
-                                        Hello, I would like to discuss a potential partnership opportunities with your agency...
+                                        {msg.message}
                                     </span>
                                 </div>
                                 <div className="col-span-2 text-right text-xs text-white/40">
@@ -66,7 +81,7 @@ export default function Messages() {
                                 </div>
                             </div>
                         </div>
-                    ))}
+                    )) || <div className="p-8 text-center text-white/40">No messages found.</div>}
                 </div>
             </div>
         </div>
