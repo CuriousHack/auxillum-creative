@@ -3,7 +3,15 @@ const Project = require('../models/Project');
 // Create new project
 exports.createProject = async (req, res) => {
     try {
-        const { title, category, year, image, link } = req.body;
+        let { title, category, year, image, link } = req.body;
+
+        // Handle file upload
+        if (req.file) {
+            // Assuming server is running on localhost/domain, construct full URL or relative path
+            // Here we store the relative path which can be prefixed by frontend
+            image = `/uploads/projects/${req.file.filename}`;
+        }
+
         if (!title || !category || !year || !image) {
             return res.status(400).json({ message: 'Title, category, year, and image are required.' });
         }
@@ -47,7 +55,16 @@ exports.updateProject = async (req, res) => {
         if (!project) {
             return res.status(404).json({ message: 'Project not found' });
         }
-        await project.update(req.body);
+
+        let updateData = { ...req.body };
+
+        // Handle new file upload
+        if (req.file) {
+            updateData.image = `/uploads/projects/${req.file.filename}`;
+            // TODO: Optionally delete old image file here
+        }
+
+        await project.update(updateData);
         res.status(200).json(project);
     } catch (error) {
         console.error('Error updating project:', error);
