@@ -42,9 +42,10 @@ export default function AdminLayout() {
                             <Link
                                 key={item.path}
                                 to={item.path}
+                                onClick={() => window.innerWidth < 768 && setIsSidebarOpen(false)}
                                 className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-colors ${isActive
-                                        ? 'bg-[#29ABE2]/10 text-[#29ABE2]'
-                                        : 'text-white/60 hover:bg-white/5 hover:text-white'
+                                    ? 'bg-[#29ABE2]/10 text-[#29ABE2]'
+                                    : 'text-white/60 hover:bg-white/5 hover:text-white'
                                     }`}
                             >
                                 {item.icon}

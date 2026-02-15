@@ -27,6 +27,7 @@ export interface Service {
     title: string;
     subtitle: string;
     description: string;
+    icon: string; // Store icon name as string
     features: string[];
     iconObj?: any; // Icon component reference (handled in component)
 }
@@ -36,6 +37,7 @@ export interface Message {
     name: string;
     email: string;
     subject: string;
+    message: string;
     date: string;
     isRead: boolean;
     // content?: string;
@@ -100,6 +102,7 @@ export const api = {
                     id: 1,
                     title: "ATL & Media Buying",
                     subtitle: "Strategic Placement",
+                    icon: "tv",
                     description: "Mass reach through TV, Radio, and Digital Outdoor. Data-driven media planning for maximum impact.",
                     features: ["Broadcast Media Planning", "Digital Out-Of-Home (DOOH)", "Cross-Platform Strategy", "Performance Analytics"]
                 },
@@ -107,6 +110,7 @@ export const api = {
                     id: 2,
                     title: "BTL & Experiential",
                     subtitle: "Direct Engagement",
+                    icon: "target",
                     description: "Immersive brand experiences that create lasting connections through launches and activations.",
                     features: ["Campaign Strategy & Launch", "Brand Activations", "Partnership Marketing", "Influencer Collaborations"]
                 },
@@ -114,13 +118,15 @@ export const api = {
                     id: 3,
                     title: "Creative Content",
                     subtitle: "Narrative-Driven",
-                    description: "Compelling visual storytelling that captures attention and builds emotional connections.",
+                    icon: "film",
+                    description: "Compelling storytelling across formats that captivates audiences and elevates brands.",
                     features: ["Digital & Social Campaigns", "Documentaries & Docuseries", "Brand Films", "Video Production"]
                 },
                 {
                     id: 4,
                     title: "Radio & Audio",
                     subtitle: "Sound Strategy",
+                    icon: "headphones",
                     description: "Audio content that resonates with listeners across all platforms and markets.",
                     features: ["Radio Show Production", "Syndication & Distribution", "Podcast Production", "Audio Branding"]
                 }
@@ -136,11 +142,11 @@ export const api = {
             console.error("Failed to fetch messages:", error);
             // Return mock data
             return [
-                { id: 1, name: "John Doe", email: "john@example.com", subject: "Partnership Inquiry", date: "2 mins ago", isRead: false },
-                { id: 2, name: "Sarah Smith", email: "sarah@design.co", subject: "Project Quote Request", date: "1 hour ago", isRead: false },
-                { id: 3, name: "Mike Johnson", email: "mike@techcorp.com", subject: "Re: Campaign Proposal", date: "Yesterday", isRead: true },
-                { id: 4, name: "Emily Davis", email: "emily@startuplab.io", subject: "Consultation needed", date: "2 days ago", isRead: true },
-                { id: 5, name: "David Wilson", email: "david@wilsongroup.com", subject: "Feedback on recent work", date: "3 days ago", isRead: true },
+                { id: 1, name: "John Doe", email: "john@example.com", subject: "Partnership Inquiry", message: "Interested in a partnership.", date: "2 mins ago", isRead: false },
+                { id: 2, name: "Sarah Smith", email: "sarah@design.co", subject: "Project Quote Request", message: "Can you provide a quote for a new website?", date: "1 hour ago", isRead: false },
+                { id: 3, name: "Mike Johnson", email: "mike@techcorp.com", subject: "Re: Campaign Proposal", message: "The proposal looks good, let's proceed.", date: "Yesterday", isRead: true },
+                { id: 4, name: "Emily Davis", email: "emily@startuplab.io", subject: "Consultation needed", message: "I'd like to schedule a consultation.", date: "2 days ago", isRead: true },
+                { id: 5, name: "David Wilson", email: "david@wilsongroup.com", subject: "Feedback on recent work", message: "Great job on the latest campaign!", date: "3 days ago", isRead: true },
             ];
         }
     },
@@ -162,6 +168,113 @@ export const api = {
                 id: Math.random(),
                 ...serviceData
             };
+        }
+    },
+
+    updateService: async (id: number, serviceData: Partial<Service>): Promise<Service> => {
+        try {
+            const response = await fetch(`${API_URL}/services/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(serviceData),
+            });
+            return handleResponse<Service>(response);
+        } catch (error) {
+            console.error("Failed to update service:", error);
+            // Mock success
+            return {
+                id,
+                title: serviceData.title || 'Updated Service',
+                subtitle: serviceData.subtitle || 'Updated Subtitle',
+                description: serviceData.description || 'Updated Description',
+                features: serviceData.features || [],
+                icon: serviceData.icon || 'Tv'
+            } as Service;
+        }
+    },
+
+    deleteService: async (id: number): Promise<void> => {
+        try {
+            const response = await fetch(`${API_URL}/services/${id}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        } catch (error) {
+            console.error("Failed to delete service:", error);
+            // Mock success (no-op)
+        }
+    },
+
+    createProject: async (projectData: FormData | Partial<Project>): Promise<Project> => {
+        try {
+            const isFormData = projectData instanceof FormData;
+            const headers: Record<string, string> = {};
+            if (!isFormData) {
+                headers['Content-Type'] = 'application/json';
+            }
+
+            const response = await fetch(`${API_URL}/projects`, {
+                method: 'POST',
+                headers,
+                body: isFormData ? projectData : JSON.stringify(projectData),
+            });
+            return handleResponse<Project>(response);
+        } catch (error) {
+            console.error("Failed to create project:", error);
+            // Mock response
+            return {
+                id: Math.random(),
+                title: 'New Project',
+                category: 'Uncategorized',
+                year: new Date().getFullYear().toString(),
+                image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb', // Placeholder
+                ...(projectData instanceof FormData ? {} : projectData)
+            } as Project;
+        }
+    },
+
+    updateProject: async (id: number, projectData: FormData | Partial<Project>): Promise<Project> => {
+        try {
+            const isFormData = projectData instanceof FormData;
+            const headers: Record<string, string> = {};
+            if (!isFormData) {
+                headers['Content-Type'] = 'application/json';
+            }
+
+            const response = await fetch(`${API_URL}/projects/${id}`, {
+                method: 'PUT',
+                headers,
+                body: isFormData ? projectData : JSON.stringify(projectData),
+            });
+            return handleResponse<Project>(response);
+        } catch (error) {
+            console.error("Failed to update project:", error);
+            // Mock response
+            return {
+                id,
+                title: 'Updated Project',
+                category: 'Uncategorized',
+                year: '2024',
+                image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb',
+                ...(projectData instanceof FormData ? {} : projectData)
+            } as Project;
+        }
+    },
+
+    deleteProject: async (id: number): Promise<void> => {
+        try {
+            const response = await fetch(`${API_URL}/projects/${id}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        } catch (error) {
+            console.error("Failed to delete project:", error);
         }
     }
 };
