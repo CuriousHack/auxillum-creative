@@ -11,4 +11,9 @@ router.get('/:id', contactController.getContactById);
 router.put('/:id', contactController.updateContact);
 router.delete('/:id', contactController.deleteContact);
 
+// Message operations
+router.put('/:id/read', contactController.markAsRead);
+router.put('/:id/unread', contactController.markAsUnread);
+router.post('/:id/reply', contactController.replyToContact);
+
 module.exports = router;

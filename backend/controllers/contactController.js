@@ -59,7 +59,7 @@ exports.getContacts = async (req, res) => {
         const contacts = await Contact.findAll({ order: [['createdAt', 'DESC']] });
         res.status(200).json(contacts);
     } catch (error) {
-        console.error('Error fetching contacts:', error);
+        console.log('Error fetching contacts:', error);
         res.status(500).json({ message: 'Error fetching contacts' });
     }
 };
@@ -88,13 +88,79 @@ exports.updateContact = async (req, res) => {
             return res.status(404).json({ message: 'Contact not found' });
         }
 
-        // if (isRead !== undefined) contact.isRead = isRead;
+        if (isRead !== undefined) contact.isRead = isRead;
 
         await contact.save();
         res.status(200).json(contact);
     } catch (error) {
         console.error('Error updating contact:', error);
         res.status(500).json({ message: 'Error updating contact' });
+    }
+};
+
+// Mark as read
+exports.markAsRead = async (req, res) => {
+    try {
+        const contact = await Contact.findByPk(req.params.id);
+        if (!contact) return res.status(404).json({ message: 'Contact not found' });
+
+        contact.isRead = true;
+        await contact.save();
+        res.status(200).json({ message: 'Marked as read' });
+    } catch (error) {
+        console.error('Error marking as read:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+// Mark as unread
+exports.markAsUnread = async (req, res) => {
+    try {
+        const contact = await Contact.findByPk(req.params.id);
+        if (!contact) return res.status(404).json({ message: 'Contact not found' });
+
+        contact.isRead = false;
+        await contact.save();
+        res.status(200).json({ message: 'Marked as unread' });
+    } catch (error) {
+        console.error('Error marking as unread:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+// Reply to contact
+exports.replyToContact = async (req, res) => {
+    try {
+        const { subject, message } = req.body;
+        const contact = await Contact.findByPk(req.params.id);
+
+        if (!contact) return res.status(404).json({ message: 'Contact not found' });
+
+        // Send email
+        await sendEmail(
+            contact.email,
+            subject,
+            `<p>${message.replace(/\n/g, '<br>')}</p>`
+        );
+
+        // Log reply
+        const newReply = {
+            date: new Date(),
+            subject,
+            message
+        };
+
+        // Append to existing replies (handle if null/undefined for legacy records)
+        const currentReplies = contact.replies || [];
+        contact.replies = [...currentReplies, newReply];
+
+        await contact.save();
+
+        res.status(200).json({ message: 'Reply sent successfully' });
+
+    } catch (error) {
+        console.error('Error replying to contact:', error);
+        res.status(500).json({ message: 'Failed to send reply' });
     }
 };
 

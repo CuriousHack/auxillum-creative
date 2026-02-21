@@ -34,6 +34,10 @@ const Contact = sequelize.define('Contact', {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
     },
+    replies: {
+        type: DataTypes.JSON, // Store array of reply objects: { date, subject, message }
+        defaultValue: [],
+    },
     createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
