@@ -7,6 +7,9 @@ const projectRoutes = require('./routes/project');
 const serviceRoutes = require('./routes/service');
 const analyticsRoutes = require('./routes/analytics');
 const blogRoutes = require('./routes/blog');
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+
 
 dotenv.config();
 
@@ -22,14 +25,17 @@ app.use(countVisitors); // Count visitors globally
 
 // Routes
 
-app.use('/api/contacts', contactRoutes); // Mounts to /api/contacts
+app.use('/api/contacts', contactRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/blog', blogRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api', (req, res) => {
     res.json({ message: 'Welcome to the Auxilum Creative Media API' });
 });
+
 
 // Database Connection and Server Start
 const startServer = async () => {
