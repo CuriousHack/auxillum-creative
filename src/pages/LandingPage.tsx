@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import {
   Menu, X, Instagram, Mail, Phone, MapPin, Send,
   Play, ArrowUpRight, Sparkles,
-  Tv, Users, Film, Radio, ArrowRight, MousePointer2
+  Tv, Users, Film, Radio, ArrowRight, MousePointer2, Newspaper, Clock
 } from 'lucide-react';
+import { api, BlogPost } from '../services/api';
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,12 +18,33 @@ export default function LandingPage() {
   });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+
+  const getImageUrl = (path: string) => {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    const baseUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+    return `${baseUrl}${path}`;
+  };
+
+  useEffect(() => {
+    const loadBlogPosts = async () => {
+      try {
+        const posts = await api.fetchBlogPosts();
+        setBlogPosts(posts);
+      } catch (error) {
+        console.error("Failed to fetch blog posts", error);
+      }
+    };
+    loadBlogPosts();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 100);
 
-      const sections = ['home', 'about', 'services', 'work', 'contact'];
+      const sections = ['home', 'about', 'services', 'work', 'insights', 'contact'];
       for (const section of sections) {
         const element = document.getElementById(section);
         if (element) {
@@ -172,6 +194,7 @@ export default function LandingPage() {
                 { id: 'about', label: 'About' },
                 { id: 'services', label: 'Services' },
                 { id: 'work', label: 'Work' },
+                { id: 'insights', label: 'Insights' },
                 { id: 'contact', label: 'Contact' }
               ].map((item) => (
                 <a
@@ -223,7 +246,7 @@ export default function LandingPage() {
         {/* Mobile Menu */}
         <div className={`lg:hidden fixed inset-0 bg-black transition-transform duration-500 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="flex flex-col items-center justify-center h-full gap-8">
-            {['home', 'about', 'services', 'work', 'contact'].map((item, index) => (
+            {['home', 'about', 'services', 'work', 'insights', 'contact'].map((item, index) => (
               <a
                 key={item}
                 href={`#${item}`}
@@ -523,6 +546,93 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Blog/Insights Section */}
+      <section id="insights" className="py-32 bg-zinc-950/50">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-16">
+            <div>
+              <span className="text-[#29ABE2] text-sm font-bold tracking-widest mb-4 block">INSIGHTS</span>
+              <h2 className="text-4xl md:text-6xl font-black">
+                LATEST <span className="text-[#29ABE2]">ARTICLES</span>
+              </h2>
+            </div>
+            <div className="flex gap-4">
+              <p className="text-white/40 max-w-sm text-sm">
+                Exploring the intersection of media, technology, and creative storytelling in West Africa.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {blogPosts.slice(0, 3).map((post) => (
+              <div
+                key={post.id}
+                onClick={() => setSelectedPost(post)}
+                className="group flex flex-col h-full bg-white/[0.02] border border-white/5 hover:border-[#29ABE2]/30 transition-all duration-500 overflow-hidden cursor-pointer"
+                onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => setIsHovering(false)}
+              >
+                {/* Post Image */}
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <img
+                    src={getImageUrl(post.image)}
+                    alt={post.title}
+                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <span className="px-3 py-1 bg-[#29ABE2] text-black text-[10px] font-bold tracking-widest uppercase">
+                      {post.category}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Post Content */}
+                <div className="p-8 flex flex-col flex-1">
+                  <div className="flex items-center gap-4 mb-4 text-xs text-white/40 font-medium">
+                    <div className="flex items-center gap-1.5">
+                      <Clock size={12} className="text-[#29ABE2]" />
+                      {post.readTime}
+                    </div>
+                    <span>•</span>
+                    <div>{post.date}</div>
+                  </div>
+
+                  <h3 className="text-xl font-bold mb-4 line-clamp-2 group-hover:text-[#29ABE2] transition-colors leading-tight">
+                    {post.title}
+                  </h3>
+
+                  <p className="text-white/50 text-sm mb-8 line-clamp-3 leading-relaxed">
+                    {post.excerpt}
+                  </p>
+
+                  <div className="mt-auto flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
+                        <Newspaper size={12} className="text-[#29ABE2]" />
+                      </div>
+                      <span className="text-xs font-bold text-white/60 uppercase racking-wider">{post.author}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#29ABE2] opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                      READ MORE <ArrowRight size={14} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-16 text-center">
+            <button
+              className="px-8 py-4 border-2 border-white/10 hover:border-[#29ABE2] hover:text-[#29ABE2] transition-all font-bold text-sm tracking-widest uppercase"
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+            >
+              BROWSE ALL INSIGHTS
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* Contact Section */}
       <section id="contact" className="py-32 relative">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
@@ -693,6 +803,103 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Blog Details Modal */}
+      {selectedPost && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8 bg-black/95 backdrop-blur-2xl animate-in fade-in duration-300"
+          onClick={() => setSelectedPost(null)}
+        >
+          <div
+            className="relative w-full max-w-4xl bg-zinc-950 border border-white/10 overflow-hidden max-h-full flex flex-col shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedPost(null)}
+              className="absolute top-6 right-6 z-10 w-10 h-10 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white/60 hover:text-white border border-white/10"
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="relative aspect-video lg:aspect-[21/9]">
+                <img
+                  src={getImageUrl(selectedPost.image)}
+                  alt={selectedPost.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent" />
+                <div className="absolute bottom-8 left-8 lg:bottom-12 lg:left-12">
+                  <span className="px-4 py-1.5 bg-[#29ABE2] text-black text-xs font-black tracking-[0.2em] uppercase rounded-sm">
+                    {selectedPost.category}
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-8 lg:p-12">
+                <div className="mb-10">
+                  <div className="flex items-center gap-6 text-white/40 text-sm mb-6">
+                    <div className="flex items-center gap-2">
+                      {/* <User size={16} className="text-[#29ABE2]" /> */}
+                      <span className="text-white font-bold tracking-wide uppercase">{selectedPost.author}</span>
+                    </div>
+                    <div className="flex items-center gap-2 font-medium">
+                      <Clock size={16} />
+                      {selectedPost.readTime}
+                    </div>
+                    <div className="hidden sm:block font-medium">{selectedPost.date}</div>
+                  </div>
+
+                  <h2 className="text-3xl md:text-5xl font-black mb-8 leading-[1.1] tracking-tight text-white">
+                    {selectedPost.title}
+                  </h2>
+
+                  <div className="w-20 h-1.5 bg-[#29ABE2] mb-10" />
+                </div>
+
+                <div className="prose prose-invert prose-lg max-w-none">
+                  <p className="text-xl text-white/70 italic mb-10 border-l-4 border-white/10 pl-6 py-2">
+                    {selectedPost.excerpt}
+                  </p>
+
+                  <div className="text-white/60 space-y-8 leading-[1.8] text-lg">
+                    {selectedPost.content.split('\n\n').map((paragraph, i) => (
+                      <p key={i}>{paragraph}</p>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Footer Section in Modal */}
+                <div className="mt-20 pt-10 border-t border-white/5 flex flex-wrap gap-4 items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <span className="text-xs font-bold text-white/30 uppercase tracking-[0.2em]">SHARE THIS INSIGHT</span>
+                    <div className="flex gap-2">
+                      <div className="w-10 h-10 border border-white/10 flex items-center justify-center hover:border-[#29ABE2] hover:text-[#29ABE2] transition-colors cursor-pointer">
+                        <Instagram size={14} />
+                      </div>
+                      <div className="w-10 h-10 border border-white/10 flex items-center justify-center hover:border-[#29ABE2] hover:text-[#29ABE2] transition-colors cursor-pointer">
+                        <Mail size={14} />
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedPost(null)}
+                    className="px-8 py-3 bg-white text-black font-bold text-sm tracking-widest uppercase hover:bg-[#29ABE2] transition-colors"
+                    onMouseEnter={() => setIsHovering(true)}
+                    onMouseLeave={() => setIsHovering(false)}
+                  >
+                    CLOSE POST
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Client Portal Modal */}
       {showPortal && (

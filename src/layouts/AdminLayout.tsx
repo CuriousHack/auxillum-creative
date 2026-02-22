@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, FolderOpen, Layers, MessageSquare,
-    Settings, LogOut, Menu, X, Sparkles
+    LogOut, Menu, X, Sparkles, Newspaper
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -14,6 +14,7 @@ export default function AdminLayout() {
         { icon: <FolderOpen size={20} />, label: 'Projects', path: '/admin/projects' },
         { icon: <Layers size={20} />, label: 'Services', path: '/admin/services' },
         { icon: <MessageSquare size={20} />, label: 'Messages', path: '/admin/messages' },
+        { icon: <Newspaper size={20} />, label: 'Blog', path: '/admin/blog' },
     ];
 
     return (

@@ -1,4 +1,5 @@
 // src/services/api.ts
+import { showToast } from '../utils/toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -49,13 +50,40 @@ export interface Message {
     // content?: string;
 }
 
+export interface BlogPost {
+    id: number;
+    title: string;
+    excerpt: string;
+    content: string;
+    author: string;
+    date: string;
+    image: string;
+    category: string;
+    readTime: string;
+}
+
 // Helper to handle response
-async function handleResponse<T>(response: Response): Promise<T> {
+async function handleResponse<T>(response: Response, method?: string): Promise<T> {
+    const isJson = response.headers.get('content-type')?.includes('application/json');
+    const responseData = isJson ? await response.json() : null;
+
     if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || `HTTP error! Status: ${response.status}`);
+        const errorMsg = responseData?.message || `HTTP error! Status: ${response.status}`;
+        showToast(errorMsg, 'error');
+        throw new Error(errorMsg);
     }
-    return response.json();
+
+    // Backend now returns { message: string, data: T } or sometimes just { message: string }
+    if (responseData && typeof responseData === 'object') {
+        // Strategy: If it's a mutation (POST, PUT, DELETE), always show the message.
+        if (method && ['POST', 'PUT', 'DELETE'].includes(method)) {
+            if (responseData.message) showToast(responseData.message, 'success');
+        }
+
+        return (responseData.data !== undefined ? responseData.data : responseData) as T;
+    }
+
+    return responseData as T;
 }
 
 export const api = {
@@ -67,6 +95,7 @@ export const api = {
             console.error("Failed to fetch stats:", error);
             // Return mock data for development if API fails
             return {
+                totalProjects: 120,
                 totalProjectsChange: "+2 this month",
                 activeServices: 4,
                 activeServicesChange: "All active",
@@ -161,6 +190,96 @@ export const api = {
         }
     },
 
+    fetchBlogPosts: async (): Promise<BlogPost[]> => {
+        try {
+            const response = await fetch(`${API_URL}/blog`);
+            return handleResponse<BlogPost[]>(response);
+        } catch (error) {
+            console.error("Failed to fetch blog posts:", error);
+            // Return mock data
+            return [
+                {
+                    id: 1,
+                    title: "The Future of Digital Content in Nigeria",
+                    excerpt: "How storytelling is evolving in the age of rapid digital transformation.",
+                    content: "The digital landscape in Nigeria is undergoing a massive shift...",
+                    author: "Shine Begho",
+                    date: "May 15, 2024",
+                    image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4",
+                    category: "INSIGHTS",
+                    readTime: "5 min read"
+                },
+                {
+                    id: 2,
+                    title: "Strategic Media Buying: A Data-Driven Approach",
+                    excerpt: "Why data is the most important asset in your advertising toolkit.",
+                    content: "In today's competitive market, simply having a presence isn't enough...",
+                    author: "Admin",
+                    date: "June 2, 2024",
+                    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
+                    category: "STRATEGY",
+                    readTime: "8 min read"
+                },
+                {
+                    id: 3,
+                    title: "Experiential Marketing: Beyond the Screen",
+                    excerpt: "Creating lasting brand connections through physical activations.",
+                    content: "While digital is powerful, physical engagement creates unique bonds...",
+                    author: "Creative Team",
+                    date: "June 10, 2024",
+                    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87",
+                    category: "EXPERIENTIAL",
+                    readTime: "6 min read"
+                }
+            ];
+        }
+    },
+
+    createBlogPost: async (postData: FormData | Partial<BlogPost>): Promise<BlogPost> => {
+        try {
+            const isFormData = postData instanceof FormData;
+            const headers: Record<string, string> = {};
+            if (!isFormData) headers['Content-Type'] = 'application/json';
+
+            const response = await fetch(`${API_URL}/blog`, {
+                method: 'POST',
+                headers,
+                body: isFormData ? postData : JSON.stringify(postData),
+            });
+            return handleResponse<BlogPost>(response, 'POST');
+        } catch (error) {
+            console.error("Failed to create blog post:", error);
+            return { id: Math.random(), ...postData } as BlogPost;
+        }
+    },
+
+    updateBlogPost: async (id: number, postData: FormData | Partial<BlogPost>): Promise<BlogPost> => {
+        try {
+            const isFormData = postData instanceof FormData;
+            const headers: Record<string, string> = {};
+            if (!isFormData) headers['Content-Type'] = 'application/json';
+
+            const response = await fetch(`${API_URL}/blog/${id}`, {
+                method: 'PUT',
+                headers,
+                body: isFormData ? postData : JSON.stringify(postData),
+            });
+            return handleResponse<BlogPost>(response, 'PUT');
+        } catch (error) {
+            console.error("Failed to update blog post:", error);
+            return { id, ...postData } as BlogPost;
+        }
+    },
+
+    deleteBlogPost: async (id: number): Promise<void> => {
+        try {
+            const response = await fetch(`${API_URL}/blog/${id}`, { method: 'DELETE' });
+            await handleResponse<void>(response, 'DELETE');
+        } catch (error) {
+            console.error("Failed to delete blog post:", error);
+        }
+    },
+
     createService: async (serviceData: Omit<Service, 'id'>): Promise<Service> => {
         try {
             const response = await fetch(`${API_URL}/services`, {
@@ -170,7 +289,7 @@ export const api = {
                 },
                 body: JSON.stringify(serviceData),
             });
-            return handleResponse<Service>(response);
+            return handleResponse<Service>(response, 'POST');
         } catch (error) {
             console.error("Failed to create service:", error);
             // Return mock created service
@@ -190,7 +309,7 @@ export const api = {
                 },
                 body: JSON.stringify(serviceData),
             });
-            return handleResponse<Service>(response);
+            return handleResponse<Service>(response, 'PUT');
         } catch (error) {
             console.error("Failed to update service:", error);
             // Mock success
@@ -210,9 +329,7 @@ export const api = {
             const response = await fetch(`${API_URL}/services/${id}`, {
                 method: 'DELETE',
             });
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+            await handleResponse<void>(response, 'DELETE');
         } catch (error) {
             console.error("Failed to delete service:", error);
             // Mock success (no-op)
@@ -232,7 +349,7 @@ export const api = {
                 headers,
                 body: isFormData ? projectData : JSON.stringify(projectData),
             });
-            return handleResponse<Project>(response);
+            return handleResponse<Project>(response, 'POST');
         } catch (error) {
             console.error("Failed to create project:", error);
             // Mock response
@@ -260,7 +377,7 @@ export const api = {
                 headers,
                 body: isFormData ? projectData : JSON.stringify(projectData),
             });
-            return handleResponse<Project>(response);
+            return handleResponse<Project>(response, 'PUT');
         } catch (error) {
             console.error("Failed to update project:", error);
             // Mock response
@@ -280,9 +397,7 @@ export const api = {
             const response = await fetch(`${API_URL}/projects/${id}`, {
                 method: 'DELETE',
             });
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+            await handleResponse<void>(response, 'DELETE');
         } catch (error) {
             console.error("Failed to delete project:", error);
         }
@@ -290,7 +405,8 @@ export const api = {
 
     markMessageRead: async (id: number): Promise<void> => {
         try {
-            await fetch(`${API_URL}/contacts/${id}/read`, { method: 'PUT' });
+            const response = await fetch(`${API_URL}/contacts/${id}/read`, { method: 'PUT' });
+            await handleResponse<void>(response, 'PUT');
         } catch (error) {
             console.error("Failed to mark message as read:", error);
         }
@@ -298,7 +414,8 @@ export const api = {
 
     markMessageUnread: async (id: number): Promise<void> => {
         try {
-            await fetch(`${API_URL}/contacts/${id}/unread`, { method: 'PUT' });
+            const response = await fetch(`${API_URL}/contacts/${id}/unread`, { method: 'PUT' });
+            await handleResponse<void>(response, 'PUT');
         } catch (error) {
             console.error("Failed to mark message as unread:", error);
         }
@@ -306,7 +423,8 @@ export const api = {
 
     deleteMessage: async (id: number): Promise<void> => {
         try {
-            await fetch(`${API_URL}/contacts/${id}`, { method: 'DELETE' });
+            const response = await fetch(`${API_URL}/contacts/${id}`, { method: 'DELETE' });
+            await handleResponse<void>(response, 'DELETE');
         } catch (error) {
             console.error("Failed to delete message:", error);
         }
