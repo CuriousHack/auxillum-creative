@@ -1,22 +1,53 @@
-// src/services/api.ts
 import { showToast } from '../utils/toast';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5000/api';
+
+export type UserRole = 'admin' | 'editor';
+
+export interface User {
+    id: number;
+    username: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: UserRole;
+    profileImage?: string;
+}
+
+export interface AuthResponse {
+    token: string;
+    user: User;
+}
 
 export interface DashboardStats {
     totalProjects: number;
-    totalProjectsChange: string; // e.g., "+2 this month"
+    totalProjectsChange: string;
     activeServices: number;
-    activeServicesChange: string; // e.g., "All active"
+    activeServicesChange: string;
     newMessages: number;
-    newMessagesChange: string; // e.g., "+5 unread"
-    totalVisits: string; // e.g., "1.2k"
-    totalVisitsChange: string; // e.g., "+12% vs last month"
-    recentActivity: Array<{
-        id: number;
-        description: string;
-        timestamp: string;
-    }>;
+    newMessagesChange: string;
+    totalVisits: string;
+    totalVisitsChange: string;
+    recentActivity: { id: number; description: string; timestamp: string }[];
+}
+
+export interface Message {
+    id: number;
+    name: string;
+    email: string;
+    phone: string;
+    service: string;
+    subject: string;
+    message: string;
+    date: string;
+    isRead: boolean;
+}
+
+export interface Service {
+    id: number;
+    title: string;
+    description: string;
+    icon?: string;
 }
 
 export interface Project {
@@ -25,29 +56,7 @@ export interface Project {
     category: string;
     year: string;
     image: string;
-}
-
-export interface Service {
-    id: number;
-    title: string;
-    subtitle: string;
-    description: string;
-    icon: string; // Store icon name as string
-    features: string[];
-    iconObj?: any; // Icon component reference (handled in component)
-}
-
-export interface Message {
-    id: number;
-    name: string;
-    email: string;
-    subject: string;
-    message: string;
-    date: string;
-    phone?: string;
-    service?: string;
-    isRead: boolean;
-    // content?: string;
+    link?: string;
 }
 
 export interface BlogPost {
@@ -57,12 +66,20 @@ export interface BlogPost {
     content: string;
     author: string;
     date: string;
-    image: string;
     category: string;
+    image: string;
     readTime: string;
 }
 
-// Helper to handle response
+// Helper to get auth headers
+const getHeaders = (isFormData = false) => {
+    const token = localStorage.getItem('token');
+    return {
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
+};
+
 async function handleResponse<T>(response: Response, method?: string): Promise<T> {
     const isJson = response.headers.get('content-type')?.includes('application/json');
     const responseData = isJson ? await response.json() : null;
@@ -73,13 +90,10 @@ async function handleResponse<T>(response: Response, method?: string): Promise<T
         throw new Error(errorMsg);
     }
 
-    // Backend now returns { message: string, data: T } or sometimes just { message: string }
     if (responseData && typeof responseData === 'object') {
-        // Strategy: If it's a mutation (POST, PUT, DELETE), always show the message.
         if (method && ['POST', 'PUT', 'DELETE'].includes(method)) {
             if (responseData.message) showToast(responseData.message, 'success');
         }
-
         return (responseData.data !== undefined ? responseData.data : responseData) as T;
     }
 
@@ -87,13 +101,13 @@ async function handleResponse<T>(response: Response, method?: string): Promise<T
 }
 
 export const api = {
+    // --- Dashboard & Analytics ---
     fetchStats: async (): Promise<DashboardStats> => {
         try {
             const response = await fetch(`${API_URL}/analytics/stats`);
             return handleResponse<DashboardStats>(response);
         } catch (error) {
             console.error("Failed to fetch stats:", error);
-            // Return mock data for development if API fails
             return {
                 totalProjects: 120,
                 totalProjectsChange: "+2 this month",
@@ -112,321 +126,227 @@ export const api = {
         }
     },
 
-    fetchProjects: async (): Promise<Project[]> => {
+    // --- Messages Management ---
+    fetchMessages: async (): Promise<Message[]> => {
         try {
-            const response = await fetch(`${API_URL}/projects`);
-            return handleResponse<Project[]>(response);
+            const response = await fetch(`${API_URL}/contacts`, { headers: getHeaders() });
+            return handleResponse<Message[]>(response);
         } catch (error) {
-            console.error("Failed to fetch projects:", error);
-            // Return mock data
+            console.error("Failed to fetch messages:", error);
             return [
-                { id: 1, title: "Shine with the Stars", category: "EVENT", year: "2023", image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3" },
-                { id: 2, title: "The Twist with Shine", category: "RADIO", year: "2020", image: "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0" },
-                { id: 3, title: "KBS Documentary", category: "CONTENT", year: "2022", image: "https://images.unsplash.com/photo-1485846234645-a62644f84728" },
-                { id: 4, title: "MTN Campaign", category: "ATL", year: "2023", image: "https://images.unsplash.com/photo-1563986768609-322da13575f3" },
+                { id: 1, name: "John Doe", email: "john@example.com", phone: "+1 234 567 8900", service: "Partnership", subject: "Partnership Inquiry", message: "Interested in a partnership.", date: "2 mins ago", isRead: false },
+                { id: 2, name: "Jane Smith", email: "jane@example.com", phone: "+1 987 654 3210", service: "Media Strategy", subject: "Quote Request", message: "Need a quote for media strategy.", date: "1 hour ago", isRead: true },
             ];
         }
     },
 
+    markMessageRead: async (id: number): Promise<void> => {
+        const response = await fetch(`${API_URL}/contacts/${id}/read`, { method: 'PUT', headers: getHeaders() });
+        return handleResponse<void>(response, 'PUT');
+    },
+
+    markMessageUnread: async (id: number): Promise<void> => {
+        const response = await fetch(`${API_URL}/contacts/${id}/unread`, { method: 'PUT', headers: getHeaders() });
+        return handleResponse<void>(response, 'PUT');
+    },
+
+    deleteMessage: async (id: number): Promise<void> => {
+        const response = await fetch(`${API_URL}/contacts/${id}`, { method: 'DELETE', headers: getHeaders() });
+        return handleResponse<void>(response, 'DELETE');
+    },
+
+    // --- Services Management ---
     fetchServices: async (): Promise<Service[]> => {
         try {
             const response = await fetch(`${API_URL}/services`);
             return handleResponse<Service[]>(response);
         } catch (error) {
             console.error("Failed to fetch services:", error);
-            // Return mock data
             return [
-                {
-                    id: 1,
-                    title: "ATL & Media Buying",
-                    subtitle: "Strategic Placement",
-                    icon: "tv",
-                    description: "Mass reach through TV, Radio, and Digital Outdoor. Data-driven media planning for maximum impact.",
-                    features: ["Broadcast Media Planning", "Digital Out-Of-Home (DOOH)", "Cross-Platform Strategy", "Performance Analytics"]
-                },
-                {
-                    id: 2,
-                    title: "BTL & Experiential",
-                    subtitle: "Direct Engagement",
-                    icon: "target",
-                    description: "Immersive brand experiences that create lasting connections through launches and activations.",
-                    features: ["Campaign Strategy & Launch", "Brand Activations", "Partnership Marketing", "Influencer Collaborations"]
-                },
-                {
-                    id: 3,
-                    title: "Creative Content",
-                    subtitle: "Narrative-Driven",
-                    icon: "film",
-                    description: "Compelling storytelling across formats that captivates audiences and elevates brands.",
-                    features: ["Digital & Social Campaigns", "Documentaries & Docuseries", "Brand Films", "Video Production"]
-                },
-                {
-                    id: 4,
-                    title: "Radio & Audio",
-                    subtitle: "Sound Strategy",
-                    icon: "headphones",
-                    description: "Audio content that resonates with listeners across all platforms and markets.",
-                    features: ["Radio Show Production", "Syndication & Distribution", "Podcast Production", "Audio Branding"]
-                }
+                { id: 1, title: 'Media Strategy', description: 'Comprehensive planning and execution...', icon: 'Target' },
+                { id: 2, title: 'Experiential Marketing', description: 'Immersive brand experiences...', icon: 'Zap' },
             ];
         }
     },
 
-    fetchMessages: async (): Promise<Message[]> => {
+    createService: async (service: Partial<Service>): Promise<Service> => {
+        const response = await fetch(`${API_URL}/services`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(service)
+        });
+        return handleResponse<Service>(response, 'POST');
+    },
+
+    updateService: async (id: number, service: Partial<Service>): Promise<Service> => {
+        const response = await fetch(`${API_URL}/services/${id}`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify(service)
+        });
+        return handleResponse<Service>(response, 'PUT');
+    },
+
+    deleteService: async (id: number): Promise<void> => {
+        const response = await fetch(`${API_URL}/services/${id}`, { method: 'DELETE', headers: getHeaders() });
+        return handleResponse<void>(response, 'DELETE');
+    },
+
+    // --- Projects Management ---
+    fetchProjects: async (): Promise<Project[]> => {
         try {
-            const response = await fetch(`${API_URL}/contacts`);
-            console.log(response);
-            return handleResponse<Message[]>(response);
+            const response = await fetch(`${API_URL}/projects`);
+            return handleResponse<Project[]>(response);
         } catch (error) {
-            console.error("Failed to fetch messages:", error);
-            // Return mock data
-            return [
-                { id: 1, name: "John Doe", email: "john@example.com", phone: "+1 234 567 8900", service: "Partnership", subject: "Partnership Inquiry", message: "Interested in a partnership.", date: "2 mins ago", isRead: false },
-                { id: 2, name: "Sarah Smith", email: "sarah@design.co", phone: "+1 987 654 3210", service: "Web Design", subject: "Project Quote Request", message: "Can you provide a quote for a new website?", date: "1 hour ago", isRead: false },
-                { id: 3, name: "Mike Johnson", email: "mike@techcorp.com", phone: "", service: "Campaign", subject: "Re: Campaign Proposal", message: "The proposal looks good, let's proceed.", date: "Yesterday", isRead: true },
-                { id: 4, name: "Emily Davis", email: "emily@startuplab.io", phone: "+1 555 123 4567", service: "Consultation", subject: "Consultation needed", message: "I'd like to schedule a consultation.", date: "2 days ago", isRead: true },
-                { id: 5, name: "David Wilson", email: "david@wilsongroup.com", phone: "", service: "General", subject: "Feedback on recent work", message: "Great job on the latest campaign!", date: "3 days ago", isRead: true },
-            ];
+            console.error("Failed to fetch projects:", error);
+            return [];
         }
     },
 
+    createProject: async (project: Partial<Project>): Promise<Project> => {
+        const response = await fetch(`${API_URL}/projects`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(project)
+        });
+        return handleResponse<Project>(response, 'POST');
+    },
+
+    updateProject: async (id: number, project: Partial<Project>): Promise<Project> => {
+        const response = await fetch(`${API_URL}/projects/${id}`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify(project)
+        });
+        return handleResponse<Project>(response, 'PUT');
+    },
+
+    deleteProject: async (id: number): Promise<void> => {
+        const response = await fetch(`${API_URL}/projects/${id}`, { method: 'DELETE', headers: getHeaders() });
+        return handleResponse<void>(response, 'DELETE');
+    },
+
+    // --- Blog Management ---
     fetchBlogPosts: async (): Promise<BlogPost[]> => {
         try {
             const response = await fetch(`${API_URL}/blog`);
             return handleResponse<BlogPost[]>(response);
         } catch (error) {
             console.error("Failed to fetch blog posts:", error);
-            // Return mock data
             return [
-                {
-                    id: 1,
-                    title: "The Future of Digital Content in Nigeria",
-                    excerpt: "How storytelling is evolving in the age of rapid digital transformation.",
-                    content: "The digital landscape in Nigeria is undergoing a massive shift...",
-                    author: "Shine Begho",
-                    date: "May 15, 2024",
-                    image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4",
-                    category: "INSIGHTS",
-                    readTime: "5 min read"
-                },
-                {
-                    id: 2,
-                    title: "Strategic Media Buying: A Data-Driven Approach",
-                    excerpt: "Why data is the most important asset in your advertising toolkit.",
-                    content: "In today's competitive market, simply having a presence isn't enough...",
-                    author: "Admin",
-                    date: "June 2, 2024",
-                    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
-                    category: "STRATEGY",
-                    readTime: "8 min read"
-                },
-                {
-                    id: 3,
-                    title: "Experiential Marketing: Beyond the Screen",
-                    excerpt: "Creating lasting brand connections through physical activations.",
-                    content: "While digital is powerful, physical engagement creates unique bonds...",
-                    author: "Creative Team",
-                    date: "June 10, 2024",
-                    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87",
-                    category: "EXPERIENTIAL",
-                    readTime: "6 min read"
-                }
+                { id: 1, title: 'The Future of Digital Content in Africa', excerpt: 'How streaming and creators are changing the landscape...', content: 'Full content here...', author: 'Admin', date: 'Oct 12, 2025', category: 'STRATEGY', image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80', readTime: '5 min read' },
+                { id: 2, title: 'The Impact of AI on Creative Media', excerpt: 'How AI is influencing creative decisions...', content: 'Full content...', author: 'Editor', date: 'Oct 15, 2025', category: 'INSIGHTS', image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80', readTime: '5 min read' },
             ];
         }
     },
 
-    createBlogPost: async (postData: FormData | Partial<BlogPost>): Promise<BlogPost> => {
-        try {
-            const isFormData = postData instanceof FormData;
-            const headers: Record<string, string> = {};
-            if (!isFormData) headers['Content-Type'] = 'application/json';
-
-            const response = await fetch(`${API_URL}/blog`, {
-                method: 'POST',
-                headers,
-                body: isFormData ? postData : JSON.stringify(postData),
-            });
-            return handleResponse<BlogPost>(response, 'POST');
-        } catch (error) {
-            console.error("Failed to create blog post:", error);
-            return { id: Math.random(), ...postData } as BlogPost;
-        }
+    createBlogPost: async (data: FormData | Partial<BlogPost>): Promise<BlogPost> => {
+        const isFormData = data instanceof FormData;
+        const response = await fetch(`${API_URL}/blog`, {
+            method: 'POST',
+            body: isFormData ? data : JSON.stringify(data),
+            headers: getHeaders(isFormData)
+        });
+        return handleResponse<BlogPost>(response, 'POST');
     },
 
-    updateBlogPost: async (id: number, postData: FormData | Partial<BlogPost>): Promise<BlogPost> => {
-        try {
-            const isFormData = postData instanceof FormData;
-            const headers: Record<string, string> = {};
-            if (!isFormData) headers['Content-Type'] = 'application/json';
-
-            const response = await fetch(`${API_URL}/blog/${id}`, {
-                method: 'PUT',
-                headers,
-                body: isFormData ? postData : JSON.stringify(postData),
-            });
-            return handleResponse<BlogPost>(response, 'PUT');
-        } catch (error) {
-            console.error("Failed to update blog post:", error);
-            return { id, ...postData } as BlogPost;
-        }
+    updateBlogPost: async (id: number, data: FormData | Partial<BlogPost>): Promise<BlogPost> => {
+        const isFormData = data instanceof FormData;
+        const response = await fetch(`${API_URL}/blog/${id}`, {
+            method: 'PUT',
+            body: isFormData ? data : JSON.stringify(data),
+            headers: getHeaders(isFormData)
+        });
+        return handleResponse<BlogPost>(response, 'PUT');
     },
 
     deleteBlogPost: async (id: number): Promise<void> => {
-        try {
-            const response = await fetch(`${API_URL}/blog/${id}`, { method: 'DELETE' });
-            await handleResponse<void>(response, 'DELETE');
-        } catch (error) {
-            console.error("Failed to delete blog post:", error);
-        }
+        const response = await fetch(`${API_URL}/blog/${id}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+        return handleResponse<void>(response, 'DELETE');
     },
 
-    createService: async (serviceData: Omit<Service, 'id'>): Promise<Service> => {
-        try {
-            const response = await fetch(`${API_URL}/services`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(serviceData),
-            });
-            return handleResponse<Service>(response, 'POST');
-        } catch (error) {
-            console.error("Failed to create service:", error);
-            // Return mock created service
-            return {
-                id: Math.random(),
-                ...serviceData
-            };
-        }
+    // --- Authentication ---
+    login: async (credentials: any): Promise<AuthResponse> => {
+        const response = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(credentials)
+        });
+        return handleResponse<AuthResponse>(response, 'POST');
     },
 
-    updateService: async (id: number, serviceData: Partial<Service>): Promise<Service> => {
-        try {
-            const response = await fetch(`${API_URL}/services/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(serviceData),
-            });
-            return handleResponse<Service>(response, 'PUT');
-        } catch (error) {
-            console.error("Failed to update service:", error);
-            // Mock success
-            return {
-                id,
-                title: serviceData.title || 'Updated Service',
-                subtitle: serviceData.subtitle || 'Updated Subtitle',
-                description: serviceData.description || 'Updated Description',
-                features: serviceData.features || [],
-                icon: serviceData.icon || 'Tv'
-            } as Service;
-        }
+    forgotPassword: async (email: string): Promise<{ message: string }> => {
+        const response = await fetch(`${API_URL}/auth/forgot-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        return handleResponse<{ message: string }>(response, 'POST');
     },
 
-    deleteService: async (id: number): Promise<void> => {
-        try {
-            const response = await fetch(`${API_URL}/services/${id}`, {
-                method: 'DELETE',
-            });
-            await handleResponse<void>(response, 'DELETE');
-        } catch (error) {
-            console.error("Failed to delete service:", error);
-            // Mock success (no-op)
-        }
+    verifyOTP: async (email: string, otp: string): Promise<{ message: string }> => {
+        const response = await fetch(`${API_URL}/auth/verify-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, otp })
+        });
+        return handleResponse<{ message: string }>(response, 'POST');
     },
 
-    createProject: async (projectData: FormData | Partial<Project>): Promise<Project> => {
-        try {
-            const isFormData = projectData instanceof FormData;
-            const headers: Record<string, string> = {};
-            if (!isFormData) {
-                headers['Content-Type'] = 'application/json';
-            }
-
-            const response = await fetch(`${API_URL}/projects`, {
-                method: 'POST',
-                headers,
-                body: isFormData ? projectData : JSON.stringify(projectData),
-            });
-            return handleResponse<Project>(response, 'POST');
-        } catch (error) {
-            console.error("Failed to create project:", error);
-            // Mock response
-            return {
-                id: Math.random(),
-                title: 'New Project',
-                category: 'Uncategorized',
-                year: new Date().getFullYear().toString(),
-                image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb', // Placeholder
-                ...(projectData instanceof FormData ? {} : projectData)
-            } as Project;
-        }
+    resetPassword: async (data: any): Promise<{ message: string }> => {
+        const response = await fetch(`${API_URL}/auth/reset-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        return handleResponse<{ message: string }>(response, 'POST');
     },
 
-    updateProject: async (id: number, projectData: FormData | Partial<Project>): Promise<Project> => {
-        try {
-            const isFormData = projectData instanceof FormData;
-            const headers: Record<string, string> = {};
-            if (!isFormData) {
-                headers['Content-Type'] = 'application/json';
-            }
-
-            const response = await fetch(`${API_URL}/projects/${id}`, {
-                method: 'PUT',
-                headers,
-                body: isFormData ? projectData : JSON.stringify(projectData),
-            });
-            return handleResponse<Project>(response, 'PUT');
-        } catch (error) {
-            console.error("Failed to update project:", error);
-            // Mock response
-            return {
-                id,
-                title: 'Updated Project',
-                category: 'Uncategorized',
-                year: '2024',
-                image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb',
-                ...(projectData instanceof FormData ? {} : projectData)
-            } as Project;
-        }
+    // --- User Profile & Security ---
+    updateProfile: async (data: Partial<User>): Promise<User> => {
+        const response = await fetch(`${API_URL}/auth/profile`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse<User>(response, 'PUT');
     },
 
-    deleteProject: async (id: number): Promise<void> => {
-        try {
-            const response = await fetch(`${API_URL}/projects/${id}`, {
-                method: 'DELETE',
-            });
-            await handleResponse<void>(response, 'DELETE');
-        } catch (error) {
-            console.error("Failed to delete project:", error);
-        }
+    changePassword: async (data: any): Promise<{ message: string }> => {
+        const response = await fetch(`${API_URL}/auth/change-password`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse<{ message: string }>(response, 'POST');
     },
 
-    markMessageRead: async (id: number): Promise<void> => {
-        try {
-            const response = await fetch(`${API_URL}/contacts/${id}/read`, { method: 'PUT' });
-            await handleResponse<void>(response, 'PUT');
-        } catch (error) {
-            console.error("Failed to mark message as read:", error);
-        }
+    verifyChangePassword: async (data: any): Promise<void> => {
+        const response = await fetch(`${API_URL}/auth/verify-change-password`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse<void>(response, 'POST');
     },
 
-    markMessageUnread: async (id: number): Promise<void> => {
-        try {
-            const response = await fetch(`${API_URL}/contacts/${id}/unread`, { method: 'PUT' });
-            await handleResponse<void>(response, 'PUT');
-        } catch (error) {
-            console.error("Failed to mark message as unread:", error);
-        }
+    // --- Admin User Management ---
+    createUser: async (data: any): Promise<User> => {
+        const response = await fetch(`${API_URL}/users`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse<User>(response, 'POST');
     },
 
-    deleteMessage: async (id: number): Promise<void> => {
-        try {
-            const response = await fetch(`${API_URL}/contacts/${id}`, { method: 'DELETE' });
-            await handleResponse<void>(response, 'DELETE');
-        } catch (error) {
-            console.error("Failed to delete message:", error);
-        }
+    fetchUsers: async (): Promise<User[]> => {
+        const response = await fetch(`${API_URL}/users`, {
+            headers: getHeaders()
+        });
+        return handleResponse<User[]>(response);
     }
 };

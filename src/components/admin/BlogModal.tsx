@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Loader2, Image as ImageIcon, Link as LinkIcon, Plus, User, Tag } from 'lucide-react';
 import { api, BlogPost } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 
 interface BlogModalProps {
     isOpen: boolean;
@@ -10,6 +11,7 @@ interface BlogModalProps {
 }
 
 export default function BlogModal({ isOpen, onClose, onSuccess, post }: BlogModalProps) {
+    const { user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [imageType, setImageType] = useState<'link' | 'upload'>('link');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -44,7 +46,7 @@ export default function BlogModal({ isOpen, onClose, onSuccess, post }: BlogModa
                 title: '',
                 excerpt: '',
                 content: '',
-                author: 'Admin',
+                author: user?.username || 'Admin',
                 category: 'INSIGHTS',
                 image: '',
                 readTime: '5 min read'
@@ -127,13 +129,12 @@ export default function BlogModal({ isOpen, onClose, onSuccess, post }: BlogModa
                         <div>
                             <label className="block text-xs font-bold text-white/40 uppercase tracking-wider mb-2">Author</label>
                             <div className="relative">
-                                <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
+                                <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/10" />
                                 <input
                                     type="text"
-                                    required
+                                    disabled
                                     value={formData.author}
-                                    onChange={e => setFormData({ ...formData, author: e.target.value })}
-                                    className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white focus:border-[#29ABE2] outline-none transition-colors"
+                                    className="w-full bg-white/5 border border-white/5 rounded-lg pl-10 pr-4 py-3 text-white/40 cursor-not-allowed outline-none"
                                     placeholder="Author Name"
                                 />
                             </div>

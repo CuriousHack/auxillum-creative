@@ -2,9 +2,15 @@ import { useState, useEffect } from 'react';
 import {
   Menu, X, Instagram, Mail, Phone, MapPin, Send,
   Play, ArrowUpRight, Sparkles,
-  Tv, Users, Film, Radio, ArrowRight, MousePointer2, Newspaper, Clock
+  Tv, Users, Film, Radio, ArrowRight, MousePointer2, Newspaper, Clock,
+  Target, Zap, Palette, Mic2, Megaphone, Video, Share2, Globe, Layout, Camera, Monitor, Music
 } from 'lucide-react';
-import { api, BlogPost } from '../services/api';
+import { api, BlogPost, Service, Project } from '../services/api';
+
+const iconMap: Record<string, any> = {
+  Tv, Users, Film, Radio, Target, Zap, Palette, Mic2,
+  Megaphone, Video, Share2, Globe, Layout, Camera, Monitor, Music
+};
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,6 +25,8 @@ export default function LandingPage() {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
+  const [works, setWorks] = useState<Project[]>([]);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
   const getImageUrl = (path: string) => {
@@ -29,15 +37,21 @@ export default function LandingPage() {
   };
 
   useEffect(() => {
-    const loadBlogPosts = async () => {
+    const loadData = async () => {
       try {
-        const posts = await api.fetchBlogPosts();
+        const [posts, fetchedServices, fetchedProjects] = await Promise.all([
+          api.fetchBlogPosts(),
+          api.fetchServices(),
+          api.fetchProjects()
+        ]);
         setBlogPosts(posts);
+        setServices(fetchedServices);
+        setWorks(fetchedProjects);
       } catch (error) {
-        console.error("Failed to fetch blog posts", error);
+        console.error("Failed to fetch landing page data", error);
       }
     };
-    loadBlogPosts();
+    loadData();
   }, []);
 
   useEffect(() => {
@@ -121,45 +135,6 @@ export default function LandingPage() {
     }
   };
 
-  const services = [
-    {
-      icon: <Tv className="w-10 h-10" />,
-      title: "ATL & Media Buying",
-      subtitle: "Strategic Placement",
-      description: "Mass reach through TV, Radio, and Digital Outdoor. Data-driven media planning for maximum impact.",
-      features: ["Broadcast Media Planning", "Digital Out-Of-Home (DOOH)", "Cross-Platform Strategy", "Performance Analytics"]
-    },
-    {
-      icon: <Users className="w-10 h-10" />,
-      title: "BTL & Experiential",
-      subtitle: "Direct Engagement",
-      description: "Immersive brand experiences that create lasting connections through launches and activations.",
-      features: ["Campaign Strategy & Launch", "Brand Activations", "Partnership Marketing", "Influencer Collaborations"]
-    },
-    {
-      icon: <Film className="w-10 h-10" />,
-      title: "Creative Content",
-      subtitle: "Narrative-Driven",
-      description: "Compelling visual storytelling that captures attention and builds emotional connections.",
-      features: ["Digital & Social Campaigns", "Documentaries & Docuseries", "Brand Films", "Video Production"]
-    },
-    {
-      icon: <Radio className="w-10 h-10" />,
-      title: "Radio & Audio",
-      subtitle: "Sound Strategy",
-      description: "Audio content that resonates with listeners across all platforms and markets.",
-      features: ["Radio Show Production", "Syndication & Distribution", "Podcast Production", "Audio Branding"]
-    }
-  ];
-
-  const works = [
-    { id: 1, title: "Shine with the Stars", category: "EVENT", year: "2023", image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80&w=800" },
-    { id: 2, title: "The Twist with Shine", category: "RADIO", year: "2020", image: "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&q=80&w=800" },
-    { id: 3, title: "KBS Documentary", category: "CONTENT", year: "2022", image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=800" },
-    { id: 4, title: "MTN Campaign", category: "ATL", year: "2023", image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=800" },
-    { id: 5, title: "Maltina Activation", category: "BTL", year: "2022", image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=800" },
-    { id: 6, title: "Techno Social", category: "CONTENT", year: "2023", image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&q=80&w=800" }
-  ];
 
   const stats = [
     { number: "100+", label: "Projects Delivered" },
@@ -444,39 +419,35 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            {services.map((service, index) => (
-              <div
-                key={index}
-                className="group relative p-8 md:p-12 border border-white/10 hover:border-[#29ABE2]/50 bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-500"
-                onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => setIsHovering(false)}
-              >
-                {/* Number */}
-                <div className="absolute top-8 right-8 text-6xl font-black text-white/5 group-hover:text-[#29ABE2]/10 transition-colors">
-                  0{index + 1}
+            {services.map((service, index) => {
+              const Icon = iconMap[service.icon || 'Sparkles'] || Sparkles;
+              return (
+                <div
+                  key={service.id}
+                  className="group relative p-8 md:p-12 border border-white/10 hover:border-[#29ABE2]/50 bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-500"
+                  onMouseEnter={() => setIsHovering(true)}
+                  onMouseLeave={() => setIsHovering(false)}
+                >
+                  {/* Number */}
+                  <div className="absolute top-8 right-8 text-6xl font-black text-white/5 group-hover:text-[#29ABE2]/10 transition-colors">
+                    0{index + 1}
+                  </div>
+
+                  <div className="relative z-10">
+                    <div className="text-[#29ABE2] mb-6">
+                      <Icon className="w-10 h-10" />
+                    </div>
+                    <div className="text-xs font-bold text-white/40 tracking-widest mb-2 uppercase">Core Service</div>
+                    <h3 className="text-2xl md:text-3xl font-bold mb-4">{service.title}</h3>
+                    <p className="text-white/50 mb-6">{service.description}</p>
+
+                    <a href="#contact" className="inline-flex items-center gap-2 mt-8 text-[#29ABE2] font-bold text-sm group-hover:gap-4 transition-all">
+                      GET STARTED <ArrowRight className="w-4 h-4" />
+                    </a>
+                  </div>
                 </div>
-
-                <div className="relative z-10">
-                  <div className="text-[#29ABE2] mb-6">{service.icon}</div>
-                  <div className="text-xs font-bold text-white/40 tracking-widest mb-2">{service.subtitle}</div>
-                  <h3 className="text-2xl md:text-3xl font-bold mb-4">{service.title}</h3>
-                  <p className="text-white/50 mb-6">{service.description}</p>
-
-                  <ul className="space-y-2">
-                    {service.features.map((feature, i) => (
-                      <li key={i} className="flex items-center gap-3 text-sm text-white/60">
-                        <span className="w-1 h-1 bg-[#29ABE2] rounded-full" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <a href="#contact" className="inline-flex items-center gap-2 mt-8 text-[#29ABE2] font-bold text-sm group-hover:gap-4 transition-all">
-                    GET STARTED <ArrowRight className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -510,7 +481,7 @@ export default function LandingPage() {
                 onMouseLeave={() => setIsHovering(false)}
               >
                 <img
-                  src={work.image}
+                  src={getImageUrl(work.image)}
                   alt={work.title}
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
@@ -520,7 +491,7 @@ export default function LandingPage() {
                 <div className="absolute inset-0 p-8 flex flex-col justify-end">
                   <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform">
                     <div className="flex items-center gap-4 mb-3">
-                      <span className="text-xs font-bold text-[#29ABE2] tracking-widest">{work.category}</span>
+                      <span className="text-xs font-bold text-[#29ABE2] tracking-widest uppercase">{work.category}</span>
                       <span className="text-xs text-white/40">{work.year}</span>
                     </div>
                     <h3 className="text-2xl font-bold mb-4">{work.title}</h3>
