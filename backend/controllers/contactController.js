@@ -2,6 +2,7 @@ const Contact = require('../models/Contact');
 const { sendEmail } = require('../utils/emailService');
 const { getAdminNotificationTemplate, getUserAutoReplyTemplate } = require('../utils/emailTemplates');
 const dotenv = require('dotenv');
+const { logActivity } = require('../utils/activityLogger');
 
 dotenv.config();
 
@@ -42,8 +43,11 @@ exports.submitContactForm = async (req, res) => {
 
         await Promise.allSettled([adminEmailPromise, userEmailPromise]);
 
+        // Log Activity
+        await logActivity(`New contact message from "${name}"`, 'Contact');
+
         return res.status(201).json({
-            message: 'Thank you! Your message has been sent successfully.',
+            message: 'Your message has been sent successfully!',
             data: newContact,
         });
 
@@ -57,7 +61,10 @@ exports.submitContactForm = async (req, res) => {
 exports.getContacts = async (req, res) => {
     try {
         const contacts = await Contact.findAll({ order: [['createdAt', 'DESC']] });
-        res.status(200).json(contacts);
+        res.status(200).json({
+            message: 'Contacts fetched successfully',
+            data: contacts
+        });
     } catch (error) {
         console.log('Error fetching contacts:', error);
         res.status(500).json({ message: 'Error fetching contacts' });
@@ -69,9 +76,12 @@ exports.getContactById = async (req, res) => {
     try {
         const contact = await Contact.findByPk(req.params.id);
         if (!contact) {
-            return res.status(404).json({ message: 'Contact not found' });
+            return res.status(404).json({ message: 'Contact not found.' });
         }
-        res.status(200).json(contact);
+        res.status(200).json({
+            message: 'Contact details fetched successfully',
+            data: contact
+        });
     } catch (error) {
         console.error('Error fetching contact:', error);
         res.status(500).json({ message: 'Error fetching contact' });
@@ -91,7 +101,10 @@ exports.updateContact = async (req, res) => {
         if (isRead !== undefined) contact.isRead = isRead;
 
         await contact.save();
-        res.status(200).json(contact);
+        res.status(200).json({
+            message: 'Contact updated successfully',
+            data: contact
+        });
     } catch (error) {
         console.error('Error updating contact:', error);
         res.status(500).json({ message: 'Error updating contact' });
@@ -107,6 +120,9 @@ exports.markAsRead = async (req, res) => {
         contact.isRead = true;
         await contact.save();
         res.status(200).json({ message: 'Marked as read' });
+
+        // Log Activity
+        await logActivity(`Message from "${contact.name}" marked as read`, 'Contact');
     } catch (error) {
         console.error('Error marking as read:', error);
         res.status(500).json({ message: 'Server error' });
@@ -122,6 +138,9 @@ exports.markAsUnread = async (req, res) => {
         contact.isRead = false;
         await contact.save();
         res.status(200).json({ message: 'Marked as unread' });
+
+        // Log Activity
+        await logActivity(`Message from "${contact.name}" marked as unread`, 'Contact');
     } catch (error) {
         console.error('Error marking as unread:', error);
         res.status(500).json({ message: 'Server error' });
@@ -155,8 +174,10 @@ exports.replyToContact = async (req, res) => {
         contact.replies = [...currentReplies, newReply];
 
         await contact.save();
+        res.status(200).json({ message: 'Reply sent successfully!' });
 
-        res.status(200).json({ message: 'Reply sent successfully' });
+        // Log Activity
+        await logActivity(`Replied to "${contact.name}" (${contact.email})`, 'Contact');
 
     } catch (error) {
         console.error('Error replying to contact:', error);

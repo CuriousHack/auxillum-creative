@@ -3,6 +3,7 @@ const Project = require('../models/Project');
 const Service = require('../models/Service');
 const Contact = require('../models/Contact');
 const Visitor = require('../models/Visitor');
+const Activity = require('../models/Activity');
 const sequelize = require('../config/database');
 
 exports.getDashboardStats = async (req, res) => {
@@ -59,6 +60,24 @@ exports.getDashboardStats = async (req, res) => {
             visitChange = '+100% vs last month'; // Infinite growth from 0
         }
 
+        // 5. Recent Activity
+        const recentActivities = await Activity.findAll({
+            limit: 10,
+            order: [['createdAt', 'DESC']]
+        });
+
+        // Format activities for frontend
+        const formattedActivity = recentActivities.map(activity => ({
+            id: activity.id,
+            description: activity.description,
+            timestamp: activity.createdAt.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
+        }));
+
         // Construct response object matching frontend expectation
         const stats = {
             totalProjects: totalProjects,
@@ -71,10 +90,14 @@ exports.getDashboardStats = async (req, res) => {
             newMessagesChange: `+${newMessages} unread`, // Assuming all unread are "new" context
 
             totalVisits: totalVisits,
-            totalVisitsChange: visitChange
+            totalVisitsChange: visitChange,
+            recentActivity: formattedActivity
         };
 
-        res.json(stats);
+        res.status(200).json({
+            message: 'Dashboard statistics fetched successfully',
+            data: stats
+        });
 
     } catch (error) {
         console.error('Error fetching analytics:', error);
