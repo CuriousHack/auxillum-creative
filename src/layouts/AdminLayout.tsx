@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
     LayoutDashboard, FolderOpen, Layers, MessageSquare,
-    LogOut, Menu, X, Sparkles, Newspaper
+    LogOut, Menu, X, Sparkles, Newspaper, FileText
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -16,6 +16,7 @@ export default function AdminLayout() {
         { path: '/admin/projects', icon: FolderOpen, label: 'Projects', roles: ['admin'] },
         { path: '/admin/services', icon: Layers, label: 'Services', roles: ['admin'] },
         { path: '/admin/blog', icon: Newspaper, label: 'Blog', roles: ['admin', 'editor'] },
+        { path: '/admin/resources', icon: FileText, label: 'Resources', roles: ['admin'] },
         { path: '/admin/messages', icon: MessageSquare, label: 'Messages', roles: ['admin'] },
         { path: '/admin/profile', icon: Sparkles, label: 'Profile', roles: ['admin', 'editor'] },
     ];
@@ -57,8 +58,8 @@ export default function AdminLayout() {
                                 to={item.path}
                                 onClick={() => window.innerWidth < 768 && setIsSidebarOpen(false)}
                                 className={`flex items-center h-12 rounded-xl transition-all duration-300 group ${isActive
-                                        ? 'bg-[#29ABE2] text-black shadow-lg shadow-[#29ABE2]/20'
-                                        : 'text-white/40 hover:text-white hover:bg-white/5'
+                                    ? 'bg-[#29ABE2] text-black shadow-lg shadow-[#29ABE2]/20'
+                                    : 'text-white/40 hover:text-white hover:bg-white/5'
                                     }`}
                             >
                                 <div className="min-w-[56px] flex items-center justify-center">

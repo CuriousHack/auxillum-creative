@@ -46,7 +46,9 @@ export interface Message {
 export interface Service {
     id: number;
     title: string;
+    subtitle: string;
     description: string;
+    features: string[];
     icon?: string;
 }
 
@@ -69,6 +71,14 @@ export interface BlogPost {
     category: string;
     image: string;
     readTime: string;
+}
+
+export interface Resource {
+    id: number;
+    key: string;
+    name: string;
+    path: string;
+    type?: string;
 }
 
 // Helper to get auth headers
@@ -169,20 +179,22 @@ export const api = {
         }
     },
 
-    createService: async (service: Partial<Service>): Promise<Service> => {
+    createService: async (data: FormData | Partial<Service>): Promise<Service> => {
+        const isFormData = data instanceof FormData;
         const response = await fetch(`${API_URL}/services`, {
             method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify(service)
+            body: isFormData ? data : JSON.stringify(data),
+            headers: getHeaders(isFormData)
         });
         return handleResponse<Service>(response, 'POST');
     },
 
-    updateService: async (id: number, service: Partial<Service>): Promise<Service> => {
+    updateService: async (id: number, data: FormData | Partial<Service>): Promise<Service> => {
+        const isFormData = data instanceof FormData;
         const response = await fetch(`${API_URL}/services/${id}`, {
             method: 'PUT',
-            headers: getHeaders(),
-            body: JSON.stringify(service)
+            body: isFormData ? data : JSON.stringify(data),
+            headers: getHeaders(isFormData)
         });
         return handleResponse<Service>(response, 'PUT');
     },
@@ -203,20 +215,22 @@ export const api = {
         }
     },
 
-    createProject: async (project: Partial<Project>): Promise<Project> => {
+    createProject: async (data: FormData | Partial<Project>): Promise<Project> => {
+        const isFormData = data instanceof FormData;
         const response = await fetch(`${API_URL}/projects`, {
             method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify(project)
+            body: isFormData ? data : JSON.stringify(data),
+            headers: getHeaders(isFormData)
         });
         return handleResponse<Project>(response, 'POST');
     },
 
-    updateProject: async (id: number, project: Partial<Project>): Promise<Project> => {
+    updateProject: async (id: number, data: FormData | Partial<Project>): Promise<Project> => {
+        const isFormData = data instanceof FormData;
         const response = await fetch(`${API_URL}/projects/${id}`, {
             method: 'PUT',
-            headers: getHeaders(),
-            body: JSON.stringify(project)
+            body: isFormData ? data : JSON.stringify(data),
+            headers: getHeaders(isFormData)
         });
         return handleResponse<Project>(response, 'PUT');
     },
@@ -348,5 +362,25 @@ export const api = {
             headers: getHeaders()
         });
         return handleResponse<User[]>(response);
+    },
+
+    // --- Resources Management ---
+    fetchResource: async (key: string): Promise<Resource> => {
+        const response = await fetch(`${API_URL}/resources/${key}`);
+        return handleResponse<Resource>(response);
+    },
+
+    fetchAllResources: async (): Promise<Resource[]> => {
+        const response = await fetch(`${API_URL}/resources`, { headers: getHeaders() });
+        return handleResponse<Resource[]>(response);
+    },
+
+    upsertResource: async (data: FormData): Promise<Resource> => {
+        const response = await fetch(`${API_URL}/resources`, {
+            method: 'POST',
+            body: data,
+            headers: getHeaders(true)
+        });
+        return handleResponse<Resource>(response, 'POST');
     }
 };

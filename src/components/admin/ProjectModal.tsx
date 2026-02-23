@@ -19,7 +19,8 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
         year: new Date().getFullYear().toString(),
         imageType: 'url' as 'url' | 'upload',
         imageUrl: '',
-        imageFile: null as File | null
+        imageFile: null as File | null,
+        link: ''
     });
 
     // Reset or Populate form when modal opens/closes or project changes
@@ -32,7 +33,8 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
                     year: project.year,
                     imageType: 'url', // Default to URL for existing
                     imageUrl: project.image,
-                    imageFile: null
+                    imageFile: null,
+                    link: project.link || ''
                 });
             } else {
                 setFormData({
@@ -41,7 +43,8 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
                     year: new Date().getFullYear().toString(),
                     imageType: 'url',
                     imageUrl: '',
-                    imageFile: null
+                    imageFile: null,
+                    link: ''
                 });
             }
         }
@@ -59,23 +62,21 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
 
         try {
             let payload: any;
-            const isUpload = formData.imageType === 'upload' && formData.imageFile;
-
-            if (isUpload) {
+            if (formData.imageType === 'upload' && formData.imageFile) {
                 const data = new FormData();
                 data.append('title', formData.title);
                 data.append('category', formData.category);
                 data.append('year', formData.year);
-                if (formData.imageFile) {
-                    data.append('image', formData.imageFile);
-                }
+                data.append('image', formData.imageFile);
+                data.append('link', formData.link);
                 payload = data;
             } else {
                 payload = {
                     title: formData.title,
                     category: formData.category,
                     year: formData.year,
-                    image: formData.imageUrl
+                    image: formData.imageType === 'url' ? formData.imageUrl : (project?.image || ''),
+                    link: formData.link
                 };
             }
 
@@ -88,7 +89,8 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
                     title: formData.title,
                     category: formData.category,
                     year: formData.year,
-                    image: formData.imageType === 'url' ? formData.imageUrl : URL.createObjectURL(formData.imageFile!)
+                    image: formData.imageType === 'url' ? formData.imageUrl : (formData.imageFile ? URL.createObjectURL(formData.imageFile) : project.image),
+                    link: formData.link
                 };
             } else {
                 result = await api.createProject(payload);
@@ -226,6 +228,21 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
                                 <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/80 text-white/60 text-[10px] uppercase font-bold rounded">Preview</div>
                             </div>
                         )}
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-white/40 uppercase tracking-wider mb-2">External Link (Optional)</label>
+                        <div className="relative group">
+                            <LinkIcon size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-[#29ABE2] transition-colors" />
+                            <input
+                                type="url"
+                                value={formData.link}
+                                onChange={e => setFormData({ ...formData, link: e.target.value })}
+                                className="w-full bg-black border border-white/10 rounded-lg pl-12 pr-4 py-3 text-white focus:border-[#29ABE2] outline-none transition-colors"
+                                placeholder="https://..."
+                            />
+                        </div>
+                        <p className="text-[10px] text-white/20 mt-2 font-medium uppercase tracking-widest">A direct link to the live project or detailed case study.</p>
                     </div>
 
                     <div className="flex items-center gap-3 mt-8">

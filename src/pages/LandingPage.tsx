@@ -3,9 +3,10 @@ import {
   Menu, X, Instagram, Mail, Phone, MapPin, Send,
   Play, ArrowUpRight, Sparkles,
   Tv, Users, Film, Radio, ArrowRight, MousePointer2, Newspaper, Clock,
-  Target, Zap, Palette, Mic2, Megaphone, Video, Share2, Globe, Layout, Camera, Monitor, Music
+  Target, Zap, Palette, Mic2, Megaphone, Video, Share2, Globe, Layout, Camera, Monitor, Music,
+  FileDown
 } from 'lucide-react';
-import { api, BlogPost, Service, Project } from '../services/api';
+import { api, BlogPost, Service, Project, Resource } from '../services/api';
 
 const iconMap: Record<string, any> = {
   Tv, Users, Film, Radio, Target, Zap, Palette, Mic2,
@@ -28,6 +29,7 @@ export default function LandingPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [works, setWorks] = useState<Project[]>([]);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+  const [prDocument, setPrDocument] = useState<Resource | null>(null);
 
   const getImageUrl = (path: string) => {
     if (!path) return '';
@@ -39,14 +41,16 @@ export default function LandingPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [posts, fetchedServices, fetchedProjects] = await Promise.all([
+        const [posts, fetchedServices, fetchedProjects, fetchedPR] = await Promise.all([
           api.fetchBlogPosts(),
           api.fetchServices(),
-          api.fetchProjects()
+          api.fetchProjects(),
+          api.fetchResource('pr_document').catch(() => null)
         ]);
         setBlogPosts(posts);
         setServices(fetchedServices);
         setWorks(fetchedProjects);
+        setPrDocument(fetchedPR);
       } catch (error) {
         console.error("Failed to fetch landing page data", error);
       }
@@ -302,6 +306,20 @@ export default function LandingPage() {
               <Play className="w-4 h-4" />
               WATCH SHOWREEL
             </a>
+            {prDocument && (
+              <a
+                href={getImageUrl(prDocument.path)}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-3 px-8 py-4 bg-[#29ABE2]/10 border-2 border-[#29ABE2]/30 hover:bg-[#29ABE2] hover:text-black transition-all font-bold text-sm tracking-wide"
+                onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => setIsHovering(false)}
+              >
+                <FileDown className="w-4 h-4" />
+                DOWNLOAD PR
+              </a>
+            )}
           </div>
         </div>
 
@@ -437,9 +455,20 @@ export default function LandingPage() {
                     <div className="text-[#29ABE2] mb-6">
                       <Icon className="w-10 h-10" />
                     </div>
-                    <div className="text-xs font-bold text-white/40 tracking-widest mb-2 uppercase">Core Service</div>
+                    {/* <div className="text-xs font-bold text-white/40 tracking-widest mb-2 uppercase">Core Service</div> */}
+                    <p className="text-xs font-bold text-[#29ABE2] tracking-widest mb-4">{service.subtitle.toUpperCase()}</p>
+
                     <h3 className="text-2xl md:text-3xl font-bold mb-4">{service.title}</h3>
                     <p className="text-white/50 mb-6">{service.description}</p>
+
+                    <div className="space-y-2">
+                            {service.features.map((feature, i) => (
+                                <div key={i} className="flex items-center gap-2 text-xs text-white/40">
+                                    <div className="w-1 h-1 rounded-full bg-[#29ABE2]" />
+                                    {feature}
+                                </div>
+                            ))}
+                        </div>
 
                     <a href="#contact" className="inline-flex items-center gap-2 mt-8 text-[#29ABE2] font-bold text-sm group-hover:gap-4 transition-all">
                       GET STARTED <ArrowRight className="w-4 h-4" />
@@ -476,7 +505,12 @@ export default function LandingPage() {
             {works.map((work) => (
               <div
                 key={work.id}
-                className="group relative aspect-[4/3] overflow-hidden cursor-pointer"
+                onClick={() => {
+                  if (work.link) {
+                    window.open(work.link, '_blank', 'noopener,noreferrer');
+                  }
+                }}
+                className={`group relative aspect-[4/3] overflow-hidden ${work.link ? 'cursor-pointer' : 'cursor-default'}`}
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >

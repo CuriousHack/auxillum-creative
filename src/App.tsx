@@ -5,9 +5,10 @@ import DashboardHome from './pages/admin/DashboardHome';
 import ProjectsManager from './pages/admin/ProjectsManager';
 import ServicesManager from './pages/admin/ServicesManager';
 import Messages from './pages/admin/Messages';
-import BlogManager from './pages/admin/BlogManager';
 import LoginPage from './pages/auth/LoginPage';
 import Profile from './pages/admin/Profile';
+import ResourcesManager from './pages/admin/ResourcesManager';
+import BlogManager from './pages/admin/BlogManager';
 
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
@@ -36,6 +37,7 @@ export default function App() {
               <Route path="services" element={<ServicesManager />} />
               <Route path="messages" element={<Messages />} />
               <Route path="blog" element={<BlogManager />} />
+              <Route path="resources" element={<ResourcesManager />} />
               <Route path="profile" element={<Profile />} />
             </Route>
           </Routes>
