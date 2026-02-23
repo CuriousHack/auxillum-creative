@@ -14,7 +14,12 @@ exports.createProject = async (req, res) => {
         }
 
         if (!title || !category || !year || !image) {
-            return res.status(400).json({ message: 'Title, category, year, and image are required.' });
+            console.log('Project creation failed validation. req.body:', req.body);
+            console.log('req.file:', req.file);
+            return res.status(400).json({
+                message: 'Title, category, year, and image are required.',
+                received: { title, category, year, image: image ? 'Present' : 'Missing' }
+            });
         }
         const newProject = await Project.create({ title, category, year, image, link });
         res.status(201).json({
