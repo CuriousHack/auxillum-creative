@@ -9,6 +9,7 @@ const analyticsRoutes = require('./routes/analytics');
 const blogRoutes = require('./routes/blog');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
+const resourceRoutes = require('./routes/resource');
 
 
 dotenv.config();
@@ -32,6 +33,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/resources', resourceRoutes);
 app.use('/api', (req, res) => {
     res.json({ message: 'Welcome to the Auxilum Creative Media API' });
 });
