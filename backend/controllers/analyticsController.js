@@ -62,7 +62,7 @@ exports.getDashboardStats = async (req, res) => {
 
         // 5. Recent Activity
         const recentActivities = await Activity.findAll({
-            limit: 10,
+            limit: 5,
             order: [['createdAt', 'DESC']]
         });
 
