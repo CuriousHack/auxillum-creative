@@ -20,7 +20,9 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
         imageType: 'url' as 'url' | 'upload',
         imageUrl: '',
         imageFile: null as File | null,
-        link: ''
+        attachmentType: 'link' as 'link' | 'file',
+        link: '',
+        fileItem: null as File | null
     });
 
     // Reset or Populate form when modal opens/closes or project changes
@@ -34,7 +36,9 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
                     imageType: 'url', // Default to URL for existing
                     imageUrl: project.image,
                     imageFile: null,
-                    link: project.link || ''
+                    attachmentType: project.fileUrl ? 'file' : 'link',
+                    link: project.link || '',
+                    fileItem: null
                 });
             } else {
                 setFormData({
@@ -44,7 +48,9 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
                     imageType: 'url',
                     imageUrl: '',
                     imageFile: null,
-                    link: ''
+                    attachmentType: 'link',
+                    link: '',
+                    fileItem: null
                 });
             }
         }
@@ -56,19 +62,37 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
         }
     };
 
+    const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setFormData({ ...formData, fileItem: e.target.files[0] });
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
         try {
             let payload: any;
-            if (formData.imageType === 'upload' && formData.imageFile) {
+            if (formData.imageType === 'upload' && formData.imageFile || formData.attachmentType === 'file' && formData.fileItem) {
                 const data = new FormData();
                 data.append('title', formData.title);
                 data.append('category', formData.category);
                 data.append('year', formData.year);
-                data.append('image', formData.imageFile);
-                data.append('link', formData.link);
+
+                if (formData.imageType === 'upload' && formData.imageFile) {
+                    data.append('image', formData.imageFile);
+                } else {
+                    data.append('image', formData.imageType === 'url' ? formData.imageUrl : (project?.image || ''));
+                }
+
+                if (formData.attachmentType === 'file' && formData.fileItem) {
+                    data.append('projectDocument', formData.fileItem);
+                    data.append('link', ''); // Clear link if attaching file
+                } else {
+                    data.append('link', formData.link);
+                }
+
                 payload = data;
             } else {
                 payload = {
@@ -231,18 +255,59 @@ export default function ProjectModal({ isOpen, onClose, project, onSuccess }: Pr
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-white/40 uppercase tracking-wider mb-2">External Link (Optional)</label>
-                        <div className="relative group">
-                            <LinkIcon size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-[#29ABE2] transition-colors" />
-                            <input
-                                type="url"
-                                value={formData.link}
-                                onChange={e => setFormData({ ...formData, link: e.target.value })}
-                                className="w-full bg-black border border-white/10 rounded-lg pl-12 pr-4 py-3 text-white focus:border-[#29ABE2] outline-none transition-colors"
-                                placeholder="https://..."
-                            />
+                        <label className="block text-xs font-bold text-white/40 uppercase tracking-wider mb-2">Project Attachment</label>
+
+                        <div className="flex bg-black border border-white/10 rounded-lg p-1 mb-3">
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, attachmentType: 'link' })}
+                                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded text-sm font-bold transition-colors ${formData.attachmentType === 'link' ? 'bg-[#29ABE2] text-black' : 'text-white/40 hover:text-white'}`}
+                            >
+                                <LinkIcon size={14} /> URL Link
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, attachmentType: 'file' })}
+                                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded text-sm font-bold transition-colors ${formData.attachmentType === 'file' ? 'bg-[#29ABE2] text-black' : 'text-white/40 hover:text-white'}`}
+                            >
+                                <Plus size={14} /> Upload File
+                            </button>
                         </div>
-                        <p className="text-[10px] text-white/20 mt-2 font-medium uppercase tracking-widest">A direct link to the live project or detailed case study.</p>
+
+                        {formData.attachmentType === 'link' ? (
+                            <div className="relative group">
+                                <LinkIcon size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-[#29ABE2] transition-colors" />
+                                <input
+                                    type="url"
+                                    value={formData.link}
+                                    onChange={e => setFormData({ ...formData, link: e.target.value })}
+                                    className="w-full bg-black border border-white/10 rounded-lg pl-12 pr-4 py-3 text-white focus:border-[#29ABE2] outline-none transition-colors"
+                                    placeholder="https://..."
+                                />
+                                <p className="text-[10px] text-white/20 mt-2 font-medium uppercase tracking-widest">A direct link to the live project or detailed case study.</p>
+                            </div>
+                        ) : (
+                            <div className="border border-dashed border-white/20 rounded-lg p-6 text-center hover:border-[#29ABE2]/50 transition-colors bg-white/5 relative group cursor-pointer">
+                                <input
+                                    type="file"
+                                    accept=".pdf,.ppt,.pptx,.doc,.docx"
+                                    onChange={handleDocumentChange}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                />
+                                {formData.fileItem ? (
+                                    <div className="text-sm">
+                                        <div className="text-[#29ABE2] font-bold mb-1">Attached: {formData.fileItem.name}</div>
+                                        <div className="text-white/40 text-xs">Click to change file</div>
+                                    </div>
+                                ) : (
+                                    <div className="text-sm text-white/40">
+                                        <Plus className="w-6 h-6 mx-auto mb-2 opacity-50" />
+                                        <span className="font-bold block text-white/60">Upload Project File</span>
+                                        <span className="text-xs">PDF, PPTX, DOCX</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-3 mt-8">

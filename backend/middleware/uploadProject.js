@@ -20,12 +20,27 @@ const storage = multer.diskStorage({
     }
 });
 
-// File filter (allow only images)
+// File filter (allow images and documents)
 const fileFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
+    const allowedMimeTypes = [
+        // Images
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/gif',
+        'image/svg+xml',
+        // Documents
+        'application/pdf',
+        'application/msword', // .doc
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+        'application/vnd.ms-powerpoint', // .ppt
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
+    ];
+
+    if (allowedMimeTypes.includes(file.mimetype)) {
         cb(null, true);
     } else {
-        cb(new Error('Only image files are allowed!'), false);
+        cb(new Error('Only images, PDFs, Word, and PowerPoint documents are allowed!'), false);
     }
 };
 
@@ -33,7 +48,7 @@ const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {
-        fileSize: 10 * 1024 * 1024 // 10MB limit (projects might be high res)
+        fileSize: 50 * 1024 * 1024 // 50MB limit (projects might have heavy presentation files)
     }
 });
 

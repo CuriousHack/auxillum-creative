@@ -28,6 +28,10 @@ const Project = sequelize.define('Project', {
         type: DataTypes.STRING, // Optional external link to project
         allowNull: true,
     },
+    fileUrl: {
+        type: DataTypes.STRING, // Optional uploaded project document
+        allowNull: true,
+    },
     createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
