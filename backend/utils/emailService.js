@@ -28,15 +28,23 @@ transporter.verify(function (error, success) {
  * @param {string} to - Recipient email
  * @param {string} subject - Email subject
  * @param {string} html - HTML content
+ * @param {string} [replyTo] - Optional Reply-To address
  */
-const sendEmail = async (to, subject, html) => {
+const sendEmail = async (to, subject, html, replyTo = null) => {
     try {
-        const info = await transporter.sendMail({
+        const mailOptions = {
             from: `"Auxilum Contact Form" <${process.env.EMAIL_USER}>`, // sender address
             to: to, // list of receivers
             subject: subject, // Subject line
             html: html, // html body
-        });
+        };
+
+        // Inject replyTo if prominently provided
+        if (replyTo) {
+            mailOptions.replyTo = replyTo;
+        }
+
+        const info = await transporter.sendMail(mailOptions);
         console.log('Message sent: %s', info.messageId);
         return info;
     } catch (error) {

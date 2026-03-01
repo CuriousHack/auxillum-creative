@@ -1,7 +1,32 @@
-const getAdminNotificationTemplate = (data) => {
+// Reusable header component for all templates
+const getEmailHeader = (logoUrl) => {
+  return `
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px;">
+      <tr>
+        <td align="center">
+          <table cellpadding="0" cellspacing="0" style="display: inline-table; margin: 0 auto;">
+            <tr>
+              ${logoUrl ? `
+              <td valign="middle" style="padding-right: 15px;">
+                <img src="${logoUrl}" alt="Site Logo" height="40" style="display: block; max-height: 40px; width: auto;" />
+              </td>
+              <td valign="middle" style="padding-left: 15px; border-left: 2px solid #333;">
+              ` : '<td valign="middle">'}
+                <h1 style="color: #fff; letter-spacing: 2px; margin: 0; font-size: 24px;">AUXIL<span style="color: #29ABE2;">UM</span></h1>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  `;
+};
+
+const getAdminNotificationTemplate = (data, logoUrl = null) => {
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #000; color: #fff; padding: 20px; border-radius: 8px;">
-      <h2 style="color: #29ABE2; border-bottom: 2px solid #29ABE2; padding-bottom: 10px;">New Contact Form Submission</h2>
+      ${getEmailHeader(logoUrl)}
+      <h2 style="color: #29ABE2; border-bottom: 2px solid #29ABE2; padding-bottom: 10px; margin-top: 0;">New Contact Form Submission</h2>
       <p style="color: #ccc;">You have received a new message from the Auxilum website contact form.</p>
       
       <table style="width: 100%; border-collapse: collapse; margin-top: 20px; color: #fff;">
@@ -34,12 +59,10 @@ const getAdminNotificationTemplate = (data) => {
   `;
 };
 
-const getUserAutoReplyTemplate = (name) => {
+const getUserAutoReplyTemplate = (name, logoUrl = null) => {
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #000; color: #fff; padding: 20px; border-radius: 8px;">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <h1 style="color: #fff; letter-spacing: 2px;">AUXIL<span style="color: #29ABE2;">UM</span></h1>
-      </div>
+      ${getEmailHeader(logoUrl)}
       
       <h2 style="color: #29ABE2;">We Received Your Message!</h2>
       <p style="color: #ccc; line-height: 1.6;">Hello <strong>${name}</strong>,</p>
@@ -65,11 +88,14 @@ const getUserAutoReplyTemplate = (name) => {
   `;
 };
 
-const getOTPTemplate = (otp) => {
+const getOTPTemplate = (otp, logoUrl = null) => {
   return `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden; background-color: #000; color: #fff;">
-        <div style="background-color: #29ABE2; padding: 30px; text-align: center;">
-            <h1 style="color: white; margin: 0; font-size: 24px; text-transform: uppercase;">Security Verification</h1>
+        <div style="padding: 20px 20px 0 20px;">
+            ${getEmailHeader(logoUrl)}
+        </div>
+        <div style="background-color: #29ABE2; padding: 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 20px; text-transform: uppercase;">Security Verification</h1>
         </div>
         <div style="padding: 30px; line-height: 1.6; text-align: center;">
             <p style="color: #ccc;">Your 6-digit verification code is:</p>

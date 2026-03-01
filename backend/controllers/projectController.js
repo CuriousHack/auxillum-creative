@@ -5,23 +5,27 @@ const { logActivity } = require('../utils/activityLogger');
 exports.createProject = async (req, res) => {
     try {
         let { title, category, year, image, link } = req.body;
+        let fileUrl = null;
 
-        // Handle file upload
-        if (req.file) {
-            // Assuming server is running on localhost/domain, construct full URL or relative path
-            // Here we store the relative path which can be prefixed by frontend
-            image = `/uploads/projects/${req.file.filename}`;
+        // Handle file uploads
+        if (req.files) {
+            if (req.files['image']) {
+                image = `/uploads/projects/${req.files['image'][0].filename}`;
+            }
+            if (req.files['projectDocument']) {
+                fileUrl = `/uploads/projects/${req.files['projectDocument'][0].filename}`;
+            }
         }
 
         if (!title || !category || !year || !image) {
             console.log('Project creation failed validation. req.body:', req.body);
-            console.log('req.file:', req.file);
+            console.log('req.files:', req.files);
             return res.status(400).json({
                 message: 'Title, category, year, and image are required.',
                 received: { title, category, year, image: image ? 'Present' : 'Missing' }
             });
         }
-        const newProject = await Project.create({ title, category, year, image, link });
+        const newProject = await Project.create({ title, category, year, image, link, fileUrl });
         res.status(201).json({
             message: 'Project created successfully!',
             data: newProject
@@ -76,10 +80,16 @@ exports.updateProject = async (req, res) => {
 
         let updateData = { ...req.body };
 
-        // Handle new file upload
-        if (req.file) {
-            updateData.image = `/uploads/projects/${req.file.filename}`;
-            // TODO: Optionally delete old image file here
+        // Handle new file uploads
+        if (req.files) {
+            if (req.files['image']) {
+                updateData.image = `/uploads/projects/${req.files['image'][0].filename}`;
+                // TODO: Optionally delete old image file here
+            }
+            if (req.files['projectDocument']) {
+                updateData.fileUrl = `/uploads/projects/${req.files['projectDocument'][0].filename}`;
+                updateData.link = null; // Clear link if attaching file, according to frontend logic
+            }
         }
 
         await project.update(updateData);
