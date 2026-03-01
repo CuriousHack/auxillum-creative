@@ -57,9 +57,13 @@ exports.forgotPassword = async (req, res) => {
         user.otpCode = otp;
         user.otpExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
         user.otpType = 'reset';
-        await user.save();
+        // Retrieve logo for OTP template
+        const Setting = require('../models/Setting');
+        const setting = await Setting.findOne();
+        const logoUrl = setting?.logo?.url || null;
 
-        await sendEmail(email, 'Security Code - Auxilium Admin', getOTPTemplate(otp));
+        const emailHtml = getOTPTemplate(otp, logoUrl);
+        await sendEmail(user.email, 'Password Reset OTP - Auxilium Tech', emailHtml);
 
         res.json({ message: 'Security code sent to your email' });
     } catch (error) {

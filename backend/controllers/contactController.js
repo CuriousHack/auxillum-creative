@@ -24,24 +24,38 @@ exports.submitContactForm = async (req, res) => {
             message,
         });
 
+        // 2.5 Fetch Site Setting for Logo
+        const Setting = require('../models/Setting');
+        const setting = await Setting.findOne();
+        const logoUrl = setting?.logo?.url || null;
+
         // 3. Send Emails (Async - don't block response if possible, but for reliability we wait or catch errors)
         // Admin Notification
-        const adminHtml = getAdminNotificationTemplate({ name, email, phone, service, message });
+        const adminHtml = getAdminNotificationTemplate({ name, email, phone, service, message }, logoUrl);
         const adminEmailPromise = sendEmail(
             process.env.ADMIN_EMAIL || process.env.EMAIL_USER, // Fallback to sender if admin not set
             `New Contact: ${name} - ${service || 'Inquiry'}`,
-            adminHtml
+            adminHtml,
+            email // Setting visitor's email as replyTo
         );
 
         // User Auto-Reply
-        const userHtml = getUserAutoReplyTemplate(name);
+        const userHtml = getUserAutoReplyTemplate(name, logoUrl);
         const userEmailPromise = sendEmail(
             email,
             'We received your message - Auxilum Creative Media',
             userHtml
         );
 
-        await Promise.allSettled([adminEmailPromise, userEmailPromise]);
+        // Await concurrently and specifically evaluate rejections instead of silently suppressing errors
+        const results = await Promise.allSettled([adminEmailPromise, userEmailPromise]);
+
+        results.forEach((result, index) => {
+            if (result.status === 'rejected') {
+                const type = index === 0 ? 'Admin Notification' : 'User Auto-Reply';
+                console.error(`[Email Delivery Failure] ${type} failed to send:`, result.reason);
+            }
+        });
 
         // Log Activity
         await logActivity(`New contact message from "${name}"`, 'Contact');
@@ -159,7 +173,8 @@ exports.replyToContact = async (req, res) => {
         await sendEmail(
             contact.email,
             subject,
-            `<p>${message.replace(/\n/g, '<br>')}</p>`
+            `<p>${message.replace(/\n/g, '<br>')}</p>`,
+            process.env.ADMIN_EMAIL || process.env.EMAIL_USER
         );
 
         // Log reply
