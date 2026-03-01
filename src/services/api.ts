@@ -59,6 +59,7 @@ export interface Project {
     year: string;
     image: string;
     link?: string;
+    fileUrl?: string;
 }
 
 export interface BlogPost {
@@ -79,6 +80,48 @@ export interface Resource {
     name: string;
     path: string;
     type?: string;
+}
+
+export interface Review {
+    id: number;
+    name: string;
+    company: string;
+    role: string;
+    rating: number;
+    comment: string;
+    status: 'pending' | 'approved' | 'rejected';
+    date: string;
+}
+
+export interface SiteSettings {
+    mission: string;
+    vision: string;
+    founder?: {
+        name: string;
+        role: string;
+        about: string;
+        image: string;
+        features: string[];
+    };
+    hero?: {
+        title: string;
+        subtitle: string;
+        backgroundImage: string;
+    };
+    logo?: {
+        url: string;
+        showDesktop: boolean;
+        showMobile: boolean;
+    };
+    aboutImage?: string;
+    stats?: {
+        number: string;
+        label: string;
+    }[];
+    clientRoster?: {
+        type: 'text' | 'image';
+        value: string;
+    }[];
 }
 
 // Helper to get auth headers
@@ -173,8 +216,8 @@ export const api = {
         } catch (error) {
             console.error("Failed to fetch services:", error);
             return [
-                { id: 1, title: 'Media Strategy', description: 'Comprehensive planning and execution...', icon: 'Target' },
-                { id: 2, title: 'Experiential Marketing', description: 'Immersive brand experiences...', icon: 'Zap' },
+                { id: 1, title: 'Media Strategy', subtitle: 'Strategic Planning', description: 'Comprehensive planning and execution...', features: ['Market Research', 'Media Buying'], icon: 'Target' },
+                { id: 2, title: 'Experiential Marketing', subtitle: 'Brand Experience', description: 'Immersive brand experiences...', features: ['Event Planning', 'Activations'], icon: 'Zap' },
             ];
         }
     },
@@ -280,6 +323,114 @@ export const api = {
             headers: getHeaders()
         });
         return handleResponse<void>(response, 'DELETE');
+    },
+
+    // --- Settings Management ---
+    fetchSettings: async (): Promise<SiteSettings> => {
+        try {
+            const response = await fetch(`${API_URL}/settings`);
+            return handleResponse<SiteSettings>(response);
+        } catch (error) {
+            console.error("Failed to fetch settings:", error);
+            const founderData = localStorage.getItem('site_founder');
+            const mockSettings: SiteSettings = {
+                mission: localStorage.getItem('site_mission') || "To authentically amplify African narratives through innovative creative media, bridging local cultural intelligence with global production standards.",
+                vision: localStorage.getItem('site_vision') || "To be the premier creative powerhouse out of Africa, setting the global benchmark for culturally resonant storytelling and brand experiences.",
+                founder: founderData ? JSON.parse(founderData) : {
+                    name: "Samson Aderotimi",
+                    role: "Founder & Chief Creative Officer",
+                    about: "With over a decade navigating the vibrant intersections of media, advertising, and cultural production in West Africa, Samson established Auxilum to be a catalyst for authentic storytelling. His vision is rooted in the belief that African narratives, when amplified with global production standards, have the power to shift perspectives and drive immense value for brands.",
+                    image: "/mock-images/founder.jpg",
+                    features: [
+                        "10+ Years in Creative Media",
+                        "Award-winning Campaigns",
+                        "Cultural Innovation Leader"
+                    ]
+                },
+                hero: {
+                    title: "AMPLIFYING AFRICAN NARRATIVES",
+                    subtitle: "We are a full-service creative agency building culturally resonant brands through innovative storytelling and immersive digital experiences.",
+                    backgroundImage: "https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&q=80"
+                },
+                logo: {
+                    url: "",
+                    showDesktop: false,
+                    showMobile: false
+                },
+                aboutImage: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80",
+                stats: [
+                    { number: "100+", label: "Projects Delivered" },
+                    { number: "50+", label: "Brands Served" },
+                    { number: "5+", label: "Years Experience" },
+                    { number: "10M+", label: "Audience Reach" }
+                ],
+                clientRoster: [
+                    { type: 'text', value: 'MTN' },
+                    { type: 'text', value: 'MALTINA' },
+                    { type: 'text', value: 'AIRTEL' },
+                    { type: 'text', value: 'TECHNO' },
+                    { type: 'text', value: 'KBS' },
+                    { type: 'text', value: "DOMINO'S" },
+                    { type: 'text', value: 'BELVEDERE' },
+                    { type: 'text', value: 'OVALTINE' }
+                ]
+            };
+            return mockSettings;
+        }
+    },
+
+    updateSettings: async (data: SiteSettings | FormData): Promise<SiteSettings> => {
+        const isFormData = data instanceof FormData;
+        const response = await fetch(`${API_URL}/settings`, {
+            method: 'PUT',
+            headers: getHeaders(isFormData),
+            body: isFormData ? data : JSON.stringify(data)
+        });
+        return handleResponse<SiteSettings>(response, 'PUT');
+    },
+
+    // --- Reviews Management ---
+    fetchReviews: async (): Promise<Review[]> => {
+        try {
+            const response = await fetch(`${API_URL}/reviews`, { headers: getHeaders() });
+            return handleResponse<Review[]>(response);
+        } catch (error) {
+            console.error("Failed to fetch reviews:", error);
+            return [
+                { id: 1, name: "Sarah Jenkins", company: "TechCorp", role: "CMO", rating: 5, comment: "Auxilum transformed our brand presence with their amazing creativity.", status: "approved", date: "Oct 10, 2025" },
+                { id: 2, name: "David Osei", company: "RetailPlus", role: "Director", rating: 4, comment: "Great execution on our BTL campaign.", status: "pending", date: "Oct 15, 2025" }
+            ];
+        }
+    },
+
+    fetchApprovedReviews: async (): Promise<Review[]> => {
+        try {
+            const response = await fetch(`${API_URL}/reviews/approved`);
+            return handleResponse<Review[]>(response);
+        } catch (error) {
+            console.error("Failed to fetch approved reviews:", error);
+            return [
+                { id: 1, name: "Sarah Jenkins", company: "TechCorp", role: "CMO", rating: 5, comment: "Auxilum transformed our brand presence with their amazing creativity.", status: "approved", date: "Oct 10, 2025" }
+            ];
+        }
+    },
+
+    submitReview: async (data: Partial<Review>): Promise<{ message: string }> => {
+        const response = await fetch(`${API_URL}/reviews`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        return handleResponse<{ message: string }>(response, 'POST');
+    },
+
+    updateReviewStatus: async (id: number, status: 'approved' | 'rejected'): Promise<Review> => {
+        const response = await fetch(`${API_URL}/reviews/${id}/status`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify({ status })
+        });
+        return handleResponse<Review>(response, 'PUT');
     },
 
     // --- Authentication ---

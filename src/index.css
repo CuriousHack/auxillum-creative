@@ -10,3 +10,12 @@ body {
   background-color: #29ABE2;
   color: #000;
 }
+
+/* Hide scrollbars for a cleaner UI while allowing scrolling */
+.custom-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.custom-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}

@@ -9,6 +9,9 @@ import LoginPage from './pages/auth/LoginPage';
 import Profile from './pages/admin/Profile';
 import ResourcesManager from './pages/admin/ResourcesManager';
 import BlogManager from './pages/admin/BlogManager';
+import SettingsManager from './pages/admin/SettingsManager';
+import ReviewsManager from './pages/admin/ReviewsManager';
+import SubmitReview from './pages/SubmitReview';
 
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
@@ -22,6 +25,7 @@ export default function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />
+            <Route path="/submit-review" element={<SubmitReview />} />
 
             {/* Auth Routes */}
             <Route path="/admin/login" element={<LoginPage />} />
@@ -38,6 +42,8 @@ export default function App() {
               <Route path="messages" element={<Messages />} />
               <Route path="blog" element={<BlogManager />} />
               <Route path="resources" element={<ResourcesManager />} />
+              <Route path="settings" element={<SettingsManager />} />
+              <Route path="reviews" element={<ReviewsManager />} />
               <Route path="profile" element={<Profile />} />
             </Route>
           </Routes>
