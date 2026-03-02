@@ -386,7 +386,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Stats Bar */}
+      {/* Statistics Bar */}
       <section className="relative py-16 border-y border-white/10 bg-black/50 backdrop-blur-xl">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
