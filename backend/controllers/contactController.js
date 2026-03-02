@@ -36,7 +36,6 @@ exports.submitContactForm = async (req, res) => {
             process.env.ADMIN_EMAIL || process.env.EMAIL_USER, // Fallback to sender if admin not set
             `New Contact: ${name} - ${service || 'Inquiry'}`,
             adminHtml,
-            email // Setting visitor's email as replyTo
         );
 
         // User Auto-Reply
