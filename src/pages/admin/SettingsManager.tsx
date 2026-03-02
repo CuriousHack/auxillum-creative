@@ -127,7 +127,25 @@ export default function SettingsManager() {
                 formData.append(`clientRoster_image_${index}`, file);
             });
 
-            await api.updateSettings(formData);
+            const updatedSettings = await api.updateSettings(formData);
+
+            setSettings({
+                ...updatedSettings,
+                founder: updatedSettings.founder || { name: '', role: '', about: '', image: '', features: [] },
+                hero: updatedSettings.hero || { title: '', subtitle: '', backgroundImage: '' },
+                logo: updatedSettings.logo || { url: '', showDesktop: false, showMobile: false },
+                aboutImage: updatedSettings.aboutImage || '',
+                stats: updatedSettings.stats || [],
+                clientRoster: updatedSettings.clientRoster || []
+            });
+
+            // Clear temporary file states so the UI previews uses the newly returned DB URLs
+            setImageFile(null);
+            setHeroImageFile(null);
+            setAboutImageFile(null);
+            setLogoFile(null);
+            setRosterFiles({});
+
             showToast("Settings saved successfully", "success");
         } catch (error) {
             console.error("Failed to save settings:", error);

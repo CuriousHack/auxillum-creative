@@ -153,6 +153,24 @@ async function handleResponse<T>(response: Response, method?: string): Promise<T
     return responseData as T;
 }
 
+// Ensure settings data with JSON strings are cleanly parsed to objects across the app
+const parseSettings = (data: any): SiteSettings => {
+    const safeParse = (val: any, defaultVal: any) => {
+        if (typeof val === 'string') {
+            try { return JSON.parse(val); } catch { return defaultVal; }
+        }
+        return val || defaultVal;
+    };
+    return {
+        ...data,
+        founder: safeParse(data.founder, { name: '', role: '', about: '', image: '', features: [] }),
+        hero: safeParse(data.hero, { title: '', subtitle: '', backgroundImage: '' }),
+        logo: safeParse(data.logo, { url: '', showDesktop: false, showMobile: false }),
+        stats: safeParse(data.stats, []),
+        clientRoster: safeParse(data.clientRoster, [])
+    };
+};
+
 export const api = {
     // --- Dashboard & Analytics ---
     fetchStats: async (): Promise<DashboardStats> => {
@@ -329,7 +347,8 @@ export const api = {
     fetchSettings: async (): Promise<SiteSettings> => {
         try {
             const response = await fetch(`${API_URL}/settings`);
-            return handleResponse<SiteSettings>(response);
+            const data = await handleResponse<any>(response);
+            return parseSettings(data);
         } catch (error) {
             console.error("Failed to fetch settings:", error);
             const founderData = localStorage.getItem('site_founder');
@@ -386,7 +405,8 @@ export const api = {
             headers: getHeaders(isFormData),
             body: isFormData ? data : JSON.stringify(data)
         });
-        return handleResponse<SiteSettings>(response, 'PUT');
+        const updatedData = await handleResponse<any>(response, 'PUT');
+        return parseSettings(updatedData);
     },
 
     // --- Reviews Management ---
