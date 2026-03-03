@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && git add dist -f && git commit -m \"Deploy update\" && git subtree push --prefix dist origin production"
+    "deploy": "npm run build && git add dist -f && git commit -m 'Deploying to production' && git subtree push --prefix dist origin production && git reset HEAD~1"
   },
   "dependencies": {
     "clsx": "2.1.1",
