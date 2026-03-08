@@ -58,11 +58,15 @@ exports.updateSettings = async (req, res) => {
         } = req.body;
         let setting = await Setting.findOne();
 
+        
+        // Fallback to the dynamic host if the env variable isn't set
+        const baseUrl = process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
+
         // 1. Process files into a map for easy lookup
         const fileMap = {};
         if (req.files && Array.isArray(req.files)) {
             req.files.forEach(file => {
-                fileMap[file.fieldname] = `${req.protocol}://${req.get('host')}/uploads/settings/${file.filename}`;
+                fileMap[file.fieldname] = `${baseUrl}/uploads/settings/${file.filename}`;
             });
         }
 
