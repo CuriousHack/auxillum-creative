@@ -25,7 +25,7 @@ exports.upsertResource = async (req, res) => {
 
         if (resource) {
             // Delete old file if it exists and is local
-            if (req.file && resource.path.startsWith('/uploads/')) {
+            if (req.file && resource.path.includes('/uploads/')) {
 
                 const relativePath = resource.path.replace(baseUrl, '');
                 

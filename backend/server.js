@@ -38,7 +38,14 @@ app.use('/api/users', userRoutes);
 app.use('/api/resources', resourceRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/reviews', reviewsRoutes);
-app.use('/api/uploads', express.static('uploads'));
+app.use('/api/uploads', express.static('uploads', {
+    setHeaders: (res, path)=> {
+        if(path.endsWith('.pdf')){
+            res.setHeader('Content-Type', 'Application/pdf');
+            res.setHeader('Content-Disposition', 'attachment; filename=document.pdf')
+        }
+    }
+}));
 app.use('/api', (req, res) => {
     res.json({ message: 'Welcome to the Auxilum Creative Media API' });
 });
