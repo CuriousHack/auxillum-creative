@@ -1,5 +1,7 @@
 const Blog = require('../models/Blog');
 const { logActivity } = require('../utils/activityLogger');
+const baseUrl = process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
+
 
 // Create new blog post
 exports.createBlogPost = async (req, res) => {
@@ -8,7 +10,7 @@ exports.createBlogPost = async (req, res) => {
 
         // Handle file upload
         if (req.file) {
-            image = `/uploads/blog/${req.file.filename}`;
+            image = `${baseUrl}/uploads/blog/${req.file.filename}`;
         }
 
         if (!title || !excerpt || !content) {
@@ -90,12 +92,11 @@ exports.updateBlogPost = async (req, res) => {
         if (!post) {
             return res.status(404).json({ message: 'Blog post not found.' });
         }
-
         let updateData = { ...req.body };
 
         // Handle new file upload
         if (req.file) {
-            updateData.image = `/uploads/blog/${req.file.filename}`;
+            updateData.image = `${baseUrl}/uploads/blog/${req.file.filename}`;
             // Optional: delete old image if it was a local file
         }
 

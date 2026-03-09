@@ -12,11 +12,13 @@ exports.upsertResource = async (req, res) => {
             return res.status(400).json({ message: 'Key and name are required.' });
         }
 
+        const baseUrl = process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
+
         if (!req.file && !req.body.path) {
             return res.status(400).json({ message: 'A file or path is required.' });
         }
 
-        const filePath = req.file ? `/uploads/resources/${req.file.filename}` : req.body.path;
+        const filePath = req.file ? `${baseUrl}/uploads/resources/${req.file.filename}` : req.body.path;
         const fileType = req.file ? req.file.mimetype : 'external';
 
         let resource = await Resource.findOne({ where: { key } });
@@ -24,7 +26,10 @@ exports.upsertResource = async (req, res) => {
         if (resource) {
             // Delete old file if it exists and is local
             if (req.file && resource.path.startsWith('/uploads/')) {
-                const oldPath = path.join(__dirname, '..', resource.path);
+
+                const relativePath = resource.path.replace(baseUrl, '');
+                
+                const oldPath = path.join(__dirname, '..', relativePath);
                 if (fs.existsSync(oldPath)) {
                     fs.unlinkSync(oldPath);
                 }

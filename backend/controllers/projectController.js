@@ -5,15 +5,16 @@ const { logActivity } = require('../utils/activityLogger');
 exports.createProject = async (req, res) => {
     try {
         let { title, category, year, image, link } = req.body;
+        const baseUrl = process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
         let fileUrl = null;
 
         // Handle file uploads
         if (req.files) {
             if (req.files['image']) {
-                image = `/uploads/projects/${req.files['image'][0].filename}`;
+                image = `${baseUrl}/uploads/projects/${req.files['image'][0].filename}`;
             }
             if (req.files['projectDocument']) {
-                fileUrl = `/uploads/projects/${req.files['projectDocument'][0].filename}`;
+                fileUrl = `${baseUrl}/uploads/projects/${req.files['projectDocument'][0].filename}`;
             }
         }
 
@@ -83,11 +84,11 @@ exports.updateProject = async (req, res) => {
         // Handle new file uploads
         if (req.files) {
             if (req.files['image']) {
-                updateData.image = `/uploads/projects/${req.files['image'][0].filename}`;
+                updateData.image = `${baseUrl}/uploads/projects/${req.files['image'][0].filename}`;
                 // TODO: Optionally delete old image file here
             }
             if (req.files['projectDocument']) {
-                updateData.fileUrl = `/uploads/projects/${req.files['projectDocument'][0].filename}`;
+                updateData.fileUrl = `${baseUrl}/uploads/projects/${req.files['projectDocument'][0].filename}`;
                 updateData.link = null; // Clear link if attaching file, according to frontend logic
             }
         }
