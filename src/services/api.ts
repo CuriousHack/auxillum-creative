@@ -309,7 +309,7 @@ export const api = {
         } catch (error) {
             console.error("Failed to fetch blog posts:", error);
             return [
-                { id: 1, title: 'The Future of Digital Content in Africa', excerpt: 'How streaming and creators are changing the landscape...', content: 'Full content here...', author: 'Admin', date: 'Oct 12, 2025', category: 'STRATEGY', image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80', readTime: '5 min read' },
+                { id: 1, title: 'The Future of Digital Content in Africa', excerpt: 'How streaming and creators are changing the landscape...', content: 'Full content here...', author: 'Auxilumcm', date: 'Oct 12, 2025', category: 'STRATEGY', image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80', readTime: '5 min read' },
                 { id: 2, title: 'The Impact of AI on Creative Media', excerpt: 'How AI is influencing creative decisions...', content: 'Full content...', author: 'Editor', date: 'Oct 15, 2025', category: 'INSIGHTS', image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80', readTime: '5 min read' },
             ];
         }

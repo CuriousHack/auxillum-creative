@@ -22,7 +22,7 @@ const Blog = sequelize.define('Blog', {
     author: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 'Admin',
+        defaultValue: 'Auxilumcm',
     },
     image: {
         type: DataTypes.STRING,

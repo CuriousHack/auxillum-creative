@@ -10,6 +10,8 @@ interface BlogModalProps {
     post?: BlogPost | null;
 }
 
+const DEFAULT_AUTHOR = 'Auxilumcm';
+
 export default function BlogModal({ isOpen, onClose, onSuccess, post }: BlogModalProps) {
     const { user } = useAuth();
     const [loading, setLoading] = useState(false);
@@ -18,11 +20,13 @@ export default function BlogModal({ isOpen, onClose, onSuccess, post }: BlogModa
     const [previewUrl, setPreviewUrl] = useState<string>('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const [useUsername, setUseUsername] = useState(false);
+
     const [formData, setFormData] = useState({
         title: '',
         excerpt: '',
         content: '',
-        author: '',
+        author: DEFAULT_AUTHOR,
         category: 'INSIGHTS',
         image: '',
         readTime: '5 min read'
@@ -30,11 +34,13 @@ export default function BlogModal({ isOpen, onClose, onSuccess, post }: BlogModa
 
     useEffect(() => {
         if (post) {
+            const isUserAuthor = Boolean(user?.username && post.author === user.username);
+            setUseUsername(isUserAuthor);
             setFormData({
                 title: post.title,
                 excerpt: post.excerpt,
                 content: post.content,
-                author: post.author,
+                author: post.author || DEFAULT_AUTHOR,
                 category: post.category,
                 image: post.image,
                 readTime: post.readTime
@@ -42,11 +48,12 @@ export default function BlogModal({ isOpen, onClose, onSuccess, post }: BlogModa
             setPreviewUrl(post.image);
             setImageType(post.image?.startsWith('/uploads') ? 'upload' : 'link');
         } else {
+            setUseUsername(false);
             setFormData({
                 title: '',
                 excerpt: '',
                 content: '',
-                author: user?.username || 'Admin',
+                author: DEFAULT_AUTHOR,
                 category: 'INSIGHTS',
                 image: '',
                 readTime: '5 min read'
@@ -54,7 +61,7 @@ export default function BlogModal({ isOpen, onClose, onSuccess, post }: BlogModa
             setPreviewUrl('');
             setSelectedFile(null);
         }
-    }, [post, isOpen]);
+    }, [post, isOpen, user]);
 
     const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -128,15 +135,33 @@ export default function BlogModal({ isOpen, onClose, onSuccess, post }: BlogModa
 
                         <div>
                             <label className="block text-xs font-bold text-white/40 uppercase tracking-wider mb-2">Author</label>
-                            <div className="relative">
-                                <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/10" />
+                            <div className="relative mb-2">
+                                <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
                                 <input
                                     type="text"
                                     disabled
                                     value={formData.author}
-                                    className="w-full bg-white/5 border border-white/5 rounded-lg pl-10 pr-4 py-3 text-white/40 cursor-not-allowed outline-none"
-                                    placeholder="Author Name"
+                                    className="w-full bg-white/5 border border-white/5 rounded-lg pl-10 pr-4 py-3 text-white/60 cursor-not-allowed outline-none font-medium"
                                 />
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    id="useUsernameCheckbox"
+                                    checked={useUsername}
+                                    onChange={e => {
+                                        const checked = e.target.checked;
+                                        setUseUsername(checked);
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            author: checked ? (user?.username || DEFAULT_AUTHOR) : DEFAULT_AUTHOR
+                                        }));
+                                    }}
+                                    className="w-4 h-4 rounded border-white/20 bg-black text-[#29ABE2] focus:ring-[#29ABE2] cursor-pointer"
+                                />
+                                <label htmlFor="useUsernameCheckbox" className="text-xs text-white/60 cursor-pointer font-medium select-none hover:text-white transition-colors">
+                                    Use my username ({user?.username || 'user'}) as author
+                                </label>
                             </div>
                         </div>
 

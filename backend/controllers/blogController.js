@@ -22,7 +22,7 @@ exports.createBlogPost = async (req, res) => {
             title,
             excerpt,
             content,
-            author: author || 'Admin',
+            author: author || 'Auxilumcm',
             category: category || 'INSIGHTS',
             image,
             readTime: readTime || '5 min read'
