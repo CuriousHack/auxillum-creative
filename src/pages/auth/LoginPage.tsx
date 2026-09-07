@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
+import { validatePassword } from '../../utils/passwordValidator';
+import { showToast } from '../../utils/toast';
 import {
     Mail, Lock, Eye, EyeOff, Loader2, ArrowRight,
     ArrowLeft, ShieldCheck, KeyRound, Sparkles
@@ -21,6 +23,7 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
+    const [resetSessionToken, setResetSessionToken] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -59,7 +62,10 @@ export default function LoginPage() {
         e.preventDefault();
         setLoading(true);
         try {
-            await api.verifyOTP(email, otp.join(''));
+            const res = await api.verifyOTP(email, otp.join(''));
+            if (res.resetSessionToken) {
+                setResetSessionToken(res.resetSessionToken);
+            }
             setView('reset-password');
         } catch (error) {
             console.error("OTP verification failed", error);
@@ -71,12 +77,17 @@ export default function LoginPage() {
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault();
         if (newPassword !== confirmPassword) {
-            alert("Passwords do not match");
+            showToast("Passwords do not match", "error");
+            return;
+        }
+        const validation = validatePassword(newPassword);
+        if (!validation.isValid) {
+            showToast(validation.message || "Invalid password format", "error");
             return;
         }
         setLoading(true);
         try {
-            await api.resetPassword({ email, otp: otp.join(''), newPassword });
+            await api.resetPassword({ email, resetSessionToken, otp: otp.join(''), newPassword });
             setView('success');
             setTimeout(() => setView('login'), 3000);
         } catch (error) {
@@ -284,6 +295,9 @@ export default function LoginPage() {
                                             className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:border-[#29ABE2] outline-none transition-all"
                                         />
                                     </div>
+                                    <p className="text-[10px] text-white/40 font-medium ml-1">
+                                        Min 8 chars, 1 uppercase, 1 lowercase, 1 number &amp; 1 special char.
+                                    </p>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 block ml-1">Confirm New Password</label>

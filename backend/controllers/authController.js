@@ -57,19 +57,26 @@ exports.forgotPassword = async (req, res) => {
         user.otpCode = otp;
         user.otpExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
         user.otpType = 'reset';
+
+        // Save OTP to database
+        await user.save();
+
         // Retrieve logo for OTP template
         const Setting = require('../models/Setting');
         const setting = await Setting.findOne();
         const logoUrl = setting?.logo?.url || null;
 
         const emailHtml = getOTPTemplate(otp, logoUrl);
-        await sendEmail(user.email, 'Password Reset OTP - Auxilium Tech', emailHtml);
+        await sendEmail(user.email, 'Password Reset OTP - Auxilium Creative Media', emailHtml);
 
         res.json({ message: 'Security code sent to your email' });
     } catch (error) {
+        console.error('Error sending OTP:', error);
         res.status(500).json({ message: 'Error sending OTP' });
     }
 };
+
+const { validatePassword } = require('../utils/passwordValidator');
 
 exports.verifyOtp = async (req, res) => {
     try {
@@ -78,45 +85,93 @@ exports.verifyOtp = async (req, res) => {
             where: {
                 email,
                 otpCode: otp,
-                otpType: 'reset',
-                otpExpiry: { [Op.gt]: new Date() }
+                otpType: 'reset'
             }
         });
 
         if (!user) {
-            return res.status(400).json({ message: 'Invalid or expired security code' });
+            return res.status(400).json({ message: 'Invalid security code' });
         }
 
-        res.json({ message: 'Code verified. You can now reset your password' });
+        if (!user.otpExpiry || new Date(user.otpExpiry).getTime() < Date.now()) {
+            return res.status(400).json({ message: 'Security code has expired. Please request a new one.' });
+        }
+
+        // Generate reset session token & expiry
+        const resetSessionToken = crypto.randomBytes(32).toString('hex');
+        const resetSessionExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+
+        // Clear OTP once verified
+        user.otpCode = null;
+        user.otpExpiry = null;
+        user.otpType = null;
+        user.resetSessionToken = resetSessionToken;
+        user.resetSessionExpiry = resetSessionExpiry;
+
+        await user.save();
+
+        res.json({
+            message: 'Code verified. You can now reset your password',
+            resetSessionToken
+        });
     } catch (error) {
+        console.error('Verification error:', error);
         res.status(500).json({ message: 'Verification error' });
     }
 };
 
+exports.verifyToken = exports.verifyOtp;
+
 exports.resetPassword = async (req, res) => {
     try {
-        const { email, otp, newPassword } = req.body;
-        const user = await User.findOne({
-            where: {
-                email,
-                otpCode: otp,
-                otpType: 'reset',
-                otpExpiry: { [Op.gt]: new Date() }
+        const { email, resetSessionToken, otp, newPassword } = req.body;
+
+        // Enforce password format validation
+        const passwordValidation = validatePassword(newPassword);
+        if (!passwordValidation.isValid) {
+            return res.status(400).json({ message: passwordValidation.message });
+        }
+
+        let user = null;
+        if (resetSessionToken) {
+            user = await User.findOne({
+                where: {
+                    email,
+                    resetSessionToken
+                }
+            });
+            if (user && (!user.resetSessionExpiry || new Date(user.resetSessionExpiry).getTime() < Date.now())) {
+                return res.status(400).json({ message: 'Reset session expired. Please start over.' });
             }
-        });
+        } else if (otp) {
+            // Fallback for direct OTP reset if token not passed
+            user = await User.findOne({
+                where: {
+                    email,
+                    otpCode: otp,
+                    otpType: 'reset'
+                }
+            });
+            if (user && (!user.otpExpiry || new Date(user.otpExpiry).getTime() < Date.now())) {
+                return res.status(400).json({ message: 'Security code has expired. Please start over.' });
+            }
+        }
 
         if (!user) {
-            return res.status(400).json({ message: 'Action expired. Please start over' });
+            return res.status(400).json({ message: 'Action expired or invalid token. Please start over' });
         }
 
         user.password = newPassword;
         user.otpCode = null;
         user.otpExpiry = null;
         user.otpType = null;
+        user.resetSessionToken = null;
+        user.resetSessionExpiry = null;
         await user.save();
 
         res.json({ message: 'Password reset successfully' });
     } catch (error) {
+        console.error('Error resetting password:', error);
         res.status(500).json({ message: 'Error resetting password' });
     }
 };
@@ -124,6 +179,13 @@ exports.resetPassword = async (req, res) => {
 exports.changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
+
+        // Enforce password format validation
+        const passwordValidation = validatePassword(newPassword);
+        if (!passwordValidation.isValid) {
+            return res.status(400).json({ message: passwordValidation.message });
+        }
+
         const user = await User.findByPk(req.user.id);
 
         if (!(await user.comparePassword(currentPassword))) {

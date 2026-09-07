@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "db:migrate": "npx sequelize-cli db:migrate"
   },
   "keywords": [],
   "author": "",
@@ -23,5 +24,8 @@
     "mysql2": "^3.17.1",
     "nodemailer": "^8.0.1",
     "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.5"
   }
 }

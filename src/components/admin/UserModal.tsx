@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { X, Mail, User, Lock, Shield, Loader2, Save } from 'lucide-react';
 import { api } from '../../services/api';
+import { validatePassword } from '../../utils/passwordValidator';
+import { showToast } from '../../utils/toast';
 
 interface UserModalProps {
     isOpen: boolean;
@@ -23,6 +25,11 @@ export default function UserModal({ isOpen, onClose, onSuccess }: UserModalProps
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const validation = validatePassword(formData.password);
+        if (!validation.isValid) {
+            showToast(validation.message || 'Invalid password format', 'error');
+            return;
+        }
         setLoading(true);
         try {
             await api.createUser(formData);
@@ -131,6 +138,9 @@ export default function UserModal({ isOpen, onClose, onSuccess }: UserModalProps
                                         placeholder="••••••••"
                                     />
                                 </div>
+                                <p className="text-[10px] text-white/40 font-medium ml-1">
+                                    Min 8 chars, 1 uppercase, 1 lowercase, 1 number &amp; 1 special char.
+                                </p>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black uppercase text-white/30 tracking-widest block ml-1">Account Role</label>

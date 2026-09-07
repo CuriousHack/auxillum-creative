@@ -57,6 +57,14 @@ const User = sequelize.define('User', {
     otpType: {
         type: DataTypes.STRING, // 'reset' or 'change'
         allowNull: true,
+    },
+    resetSessionToken: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    resetSessionExpiry: {
+        type: DataTypes.DATE,
+        allowNull: true,
     }
 }, {
     hooks: {

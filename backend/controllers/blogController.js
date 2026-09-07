@@ -1,12 +1,13 @@
 const Blog = require('../models/Blog');
 const { logActivity } = require('../utils/activityLogger');
-const baseUrl = process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
 
+const getBaseUrl = (req) => process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
 
 // Create new blog post
 exports.createBlogPost = async (req, res) => {
     try {
         let { title, excerpt, content, author, category, image, readTime } = req.body;
+        const baseUrl = getBaseUrl(req);
 
         // Handle file upload
         if (req.file) {
@@ -96,6 +97,7 @@ exports.updateBlogPost = async (req, res) => {
 
         // Handle new file upload
         if (req.file) {
+            const baseUrl = getBaseUrl(req);
             updateData.image = `${baseUrl}/uploads/blog/${req.file.filename}`;
             // Optional: delete old image if it was a local file
         }

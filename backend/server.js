@@ -58,7 +58,7 @@ const startServer = async () => {
         console.log('Database connected successfully.');
 
         // Sync models (alter: true to update tables without dropping data)
-        await sequelize.sync({ alter: true });
+        await sequelize.sync();
         console.log('Database synced.');
 
         app.listen(PORT, () => {

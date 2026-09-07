@@ -472,16 +472,25 @@ export const api = {
         return handleResponse<{ message: string }>(response, 'POST');
     },
 
-    verifyOTP: async (email: string, otp: string): Promise<{ message: string }> => {
+    verifyOTP: async (email: string, otp: string): Promise<{ message: string; resetSessionToken?: string }> => {
         const response = await fetch(`${API_URL}/auth/verify-otp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, otp })
         });
-        return handleResponse<{ message: string }>(response, 'POST');
+        return handleResponse<{ message: string; resetSessionToken?: string }>(response, 'POST');
     },
 
-    resetPassword: async (data: any): Promise<{ message: string }> => {
+    verifyToken: async (email: string, otp: string): Promise<{ message: string; resetSessionToken?: string }> => {
+        const response = await fetch(`${API_URL}/auth/verify-token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, otp })
+        });
+        return handleResponse<{ message: string; resetSessionToken?: string }>(response, 'POST');
+    },
+
+    resetPassword: async (data: { email: string; resetSessionToken?: string; otp?: string; newPassword: string }): Promise<{ message: string }> => {
         const response = await fetch(`${API_URL}/auth/reset-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

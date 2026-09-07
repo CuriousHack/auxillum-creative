@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const { validatePassword } = require('../utils/passwordValidator');
 
 exports.updateProfile = async (req, res) => {
     try {
@@ -36,6 +37,11 @@ exports.updateProfile = async (req, res) => {
 exports.createUser = async (req, res) => {
     try {
         const { firstName, lastName, username, email, password, role } = req.body;
+
+        const passwordValidation = validatePassword(password);
+        if (!passwordValidation.isValid) {
+            return res.status(400).json({ message: passwordValidation.message });
+        }
 
         const userExists = await User.findOne({ where: { email } });
         if (userExists) {

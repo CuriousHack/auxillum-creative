@@ -48,7 +48,12 @@ export default function Profile() {
     const handlePasswordChangeRequest = async (e: React.FormEvent) => {
         e.preventDefault();
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            alert("New passwords do not match");
+            showToast("New passwords do not match", "error");
+            return;
+        }
+        const validation = validatePassword(passwordData.newPassword);
+        if (!validation.isValid) {
+            showToast(validation.message || "Invalid password format", "error");
             return;
         }
         setSubmitting(true);
@@ -253,6 +258,9 @@ export default function Profile() {
                                         className="w-full bg-black border border-white/10 rounded-xl px-5 py-4 text-white focus:border-[#29ABE2] transition-all outline-none"
                                         placeholder="••••••••"
                                     />
+                                    <p className="text-[10px] text-white/40 font-medium ml-1">
+                                        Min 8 chars, 1 uppercase, 1 lowercase, 1 number &amp; 1 special char.
+                                    </p>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase text-white/30 tracking-widest block ml-1">Confirm New Password</label>

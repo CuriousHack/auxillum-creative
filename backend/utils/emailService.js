@@ -33,7 +33,7 @@ transporter.verify(function (error, success) {
 const sendEmail = async (to, subject, html, replyTo = null) => {
     try {
         const mailOptions = {
-            from: `"Auxilum Contact Form" <${process.env.EMAIL_USER}>`, // sender address
+            from: `"Auxilum Creative Media" <${process.env.EMAIL_USER}>`, // sender address
             to: to, // list of receivers
             subject: subject, // Subject line
             html: html, // html body
@@ -48,6 +48,7 @@ const sendEmail = async (to, subject, html, replyTo = null) => {
         console.log('Message sent: %s', info.messageId);
         return info;
     } catch (error) {
+        console.log('Error sending email:', error);
         console.error('Error sending email:', error);
         throw error;
     }
