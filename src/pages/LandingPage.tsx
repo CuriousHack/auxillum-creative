@@ -4,7 +4,7 @@ import {
   Play, ArrowUpRight, Sparkles,
   Tv, Users, Film, Radio, ArrowRight, MousePointer2, Newspaper, Clock,
   Target, Zap, Palette, Mic2, Megaphone, Video, Share2, Globe, Layout, Camera, Monitor, Music,
-  FileDown, ShieldCheck, Lightbulb, Star, Eye
+  FileDown, ShieldCheck, Lightbulb, Star, Eye, User, ArrowLeft
 } from 'lucide-react';
 import { api, BlogPost, Service, Project, Resource, SiteSettings, Review } from '../services/api';
 
@@ -91,6 +91,17 @@ export default function LandingPage() {
     };
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (selectedPost) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [selectedPost]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -1065,98 +1076,201 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* Blog Details Modal */}
+      {/* Full-Screen Blog Post View */}
       {selectedPost && (
         <div
-          className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8 bg-black/95 backdrop-blur-2xl animate-in fade-in duration-300"
-          onClick={() => setSelectedPost(null)}
+          id="fullscreen-blog-container"
+          className="fixed inset-0 z-[200] bg-zinc-950 text-white overflow-y-auto w-full h-full min-h-screen animate-in fade-in duration-300 flex flex-col"
         >
-          <div
-            className="relative w-full max-w-4xl bg-zinc-950 border border-white/10 overflow-hidden max-h-full flex flex-col shadow-2xl"
-            onClick={e => e.stopPropagation()}
-          >
-            {/* Close Button */}
+          {/* Sticky Top Navigation Bar */}
+          <div className="sticky top-0 z-50 bg-zinc-950/90 backdrop-blur-xl border-b border-white/10 px-6 py-4 flex items-center justify-between">
             <button
               onClick={() => setSelectedPost(null)}
-              className="absolute top-6 right-6 z-10 w-10 h-10 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white/60 hover:text-white border border-white/10"
+              className="flex items-center gap-3 text-white/70 hover:text-[#29ABE2] transition-colors group text-sm font-bold tracking-wider uppercase"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
             >
-              <X className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#29ABE2] transition-colors">
+                <ArrowLeft size={16} />
+              </div>
+              <span>Back to Insights</span>
             </button>
 
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto">
-              <div className="relative aspect-video lg:aspect-[21/9]">
-                <img
-                  src={getImageUrl(selectedPost.image)}
-                  alt={selectedPost.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent" />
-                <div className="absolute bottom-8 left-8 lg:bottom-12 lg:left-12">
-                  <span className="px-4 py-1.5 bg-[#29ABE2] text-black text-xs font-black tracking-[0.2em] uppercase rounded-sm">
-                    {selectedPost.category}
-                  </span>
+            <div className="hidden md:flex items-center gap-3">
+              <span className="px-3 py-1 bg-[#29ABE2]/10 border border-[#29ABE2]/30 text-[#29ABE2] text-xs font-bold tracking-widest uppercase">
+                {selectedPost.category}
+              </span>
+              <span className="text-white/30 text-xs">•</span>
+              <span className="text-white/50 text-xs font-medium flex items-center gap-1">
+                <Clock size={12} className="text-[#29ABE2]" /> {selectedPost.readTime}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setSelectedPost(null)}
+                className="w-9 h-9 bg-white/10 hover:bg-[#29ABE2] text-white hover:text-black transition-colors rounded-full flex items-center justify-center border border-white/10"
+                onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => setIsHovering(false)}
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Responsive Hero Image Section with Framing & Spacing */}
+          <div className="w-full max-w-4xl mx-auto px-8 md:px-12 pt-6 md:pt-10">
+            <div className="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-zinc-900/60 shadow-2xl p-3 sm:p-5 md:p-6 flex items-center justify-center">
+              <img
+                src={getImageUrl(selectedPost.image)}
+                alt={selectedPost.title}
+                className="w-full h-auto max-h-[65vh] object-cover rounded-xl"
+              />
+            </div>
+          </div>
+
+          {/* Article Header & Title Details (Directly under hero image) */}
+          <div className="w-full max-w-4xl mx-auto px-6 md:px-12 pt-8 md:pt-10">
+            <div className="mb-8">
+              <span className="inline-block px-4 py-1.5 bg-[#29ABE2] text-black text-xs font-black tracking-[0.2em] uppercase mb-6 rounded-sm">
+                {selectedPost.category}
+              </span>
+
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.15] tracking-tight text-white mb-6">
+                {selectedPost.title}
+              </h1>
+
+              <div className="flex flex-wrap items-center gap-6 text-white/60 text-sm font-medium pb-8 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-[#29ABE2]/20 border border-[#29ABE2]/40 flex items-center justify-center text-[#29ABE2]">
+                    <User size={14} />
+                  </div>
+                  <span className="text-white font-bold tracking-wide uppercase">{selectedPost.author}</span>
                 </div>
+                <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                <div className="flex items-center gap-2">
+                  <Clock size={14} className="text-[#29ABE2]" />
+                  <span>{selectedPost.readTime}</span>
+                </div>
+                <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                <span>{selectedPost.date}</span>
               </div>
+            </div>
+          </div>
 
-              <div className="p-8 lg:p-12">
-                <div className="mb-10">
-                  <div className="flex items-center gap-6 text-white/40 text-sm mb-6">
-                    <div className="flex items-center gap-2">
-                      {/* <User size={16} className="text-[#29ABE2]" /> */}
-                      <span className="text-white font-bold tracking-wide uppercase">{selectedPost.author}</span>
-                    </div>
-                    <div className="flex items-center gap-2 font-medium">
-                      <Clock size={16} />
-                      {selectedPost.readTime}
-                    </div>
-                    <div className="hidden sm:block font-medium">{selectedPost.date}</div>
-                  </div>
+          {/* Main Article Content */}
+          <div className="flex-1 max-w-4xl mx-auto px-6 md:px-12 pb-12 lg:pb-16 w-full">
+            <div className="prose prose-invert prose-lg max-w-none">
+              <p className="text-xl md:text-2xl text-white/80 italic mb-12 border-l-4 border-[#29ABE2] pl-6 py-3 bg-white/[0.02] rounded-r-lg leading-relaxed">
+                {selectedPost.excerpt}
+              </p>
 
-                  <h2 className="text-3xl md:text-5xl font-black mb-8 leading-[1.1] tracking-tight text-white">
-                    {selectedPost.title}
-                  </h2>
+              <div className="text-white/70 space-y-8 leading-[1.9] text-lg font-normal">
+                {selectedPost.content.split('\n\n').map((paragraph, i) => (
+                  <p key={i}>{paragraph}</p>
+                ))}
+              </div>
+            </div>
 
-                  <div className="w-20 h-1.5 bg-[#29ABE2] mb-10" />
-                </div>
-
-                <div className="prose prose-invert prose-lg max-w-none">
-                  <p className="text-xl text-white/70 italic mb-10 border-l-4 border-white/10 pl-6 py-2">
-                    {selectedPost.excerpt}
-                  </p>
-
-                  <div className="text-white/60 space-y-8 leading-[1.8] text-lg">
-                    {selectedPost.content.split('\n\n').map((paragraph, i) => (
-                      <p key={i}>{paragraph}</p>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Footer Section in Modal */}
-                <div className="mt-20 pt-10 border-t border-white/5 flex flex-wrap gap-4 items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <span className="text-xs font-bold text-white/30 uppercase tracking-[0.2em]">SHARE THIS INSIGHT</span>
-                    <div className="flex gap-2">
-                      <div className="w-10 h-10 border border-white/10 flex items-center justify-center hover:border-[#29ABE2] hover:text-[#29ABE2] transition-colors cursor-pointer">
-                        <Instagram size={14} />
-                      </div>
-                      <div className="w-10 h-10 border border-white/10 flex items-center justify-center hover:border-[#29ABE2] hover:text-[#29ABE2] transition-colors cursor-pointer">
-                        <Mail size={14} />
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setSelectedPost(null)}
-                    className="px-8 py-3 bg-white text-black font-bold text-sm tracking-widest uppercase hover:bg-[#29ABE2] transition-colors"
-                    onMouseEnter={() => setIsHovering(true)}
-                    onMouseLeave={() => setIsHovering(false)}
+            {/* Share / Engagement Bar */}
+            <div className="mt-16 pt-8 border-t border-white/10 flex flex-wrap gap-4 items-center justify-between">
+              <div className="flex items-center gap-4">
+                <span className="text-xs font-bold text-white/40 uppercase tracking-[0.2em]">SHARE THIS ARTICLE</span>
+                <div className="flex gap-2">
+                  <a
+                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(selectedPost.title)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-10 h-10 border border-white/10 hover:border-[#29ABE2] hover:text-[#29ABE2] transition-colors flex items-center justify-center rounded-sm text-white/60"
                   >
-                    CLOSE POST
-                  </button>
+                    <Share2 size={16} />
+                  </a>
+                  <a
+                    href={`mailto:?subject=${encodeURIComponent(selectedPost.title)}`}
+                    className="w-10 h-10 border border-white/10 hover:border-[#29ABE2] hover:text-[#29ABE2] transition-colors flex items-center justify-center rounded-sm text-white/60"
+                  >
+                    <Mail size={16} />
+                  </a>
                 </div>
               </div>
+
+              <button
+                onClick={() => {
+                  const container = document.getElementById('fullscreen-blog-container');
+                  if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="text-xs font-bold text-[#29ABE2] hover:underline flex items-center gap-1 uppercase tracking-widest"
+              >
+                Top of page ↑
+              </button>
+            </div>
+
+            {/* SECTION: Related Articles & Services (To reduce bounce rate) */}
+            <div className="mt-24 pt-16 border-t border-white/10 space-y-20">
+              
+              {/* Related Articles */}
+              {blogPosts.filter(p => p.id !== selectedPost.id).length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-8">
+                    <div>
+                      <span className="text-[#29ABE2] text-xs font-bold tracking-widest uppercase block mb-1">CONTINUE READING</span>
+                      <h3 className="text-2xl md:text-3xl font-black text-white">RELATED ARTICLES</h3>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {blogPosts
+                      .filter(p => p.id !== selectedPost.id)
+                      .slice(0, 3)
+                      .map((related) => (
+                        <div
+                          key={related.id}
+                          onClick={() => {
+                            setSelectedPost(related);
+                            const container = document.getElementById('fullscreen-blog-container');
+                            if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          className="group bg-white/[0.02] border border-white/10 hover:border-[#29ABE2]/50 transition-all duration-300 overflow-hidden cursor-pointer flex flex-col h-full"
+                          onMouseEnter={() => setIsHovering(true)}
+                          onMouseLeave={() => setIsHovering(false)}
+                        >
+                          <div className="relative aspect-[16/10] overflow-hidden">
+                            <img
+                              src={getImageUrl(related.image)}
+                              alt={related.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                            <div className="absolute top-3 left-3">
+                              <span className="px-2.5 py-0.5 bg-[#29ABE2] text-black text-[9px] font-black uppercase tracking-wider">
+                                {related.category}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="p-6 flex flex-col flex-1">
+                            <div className="flex items-center gap-2 text-xs text-white/40 mb-3">
+                              <Clock size={12} className="text-[#29ABE2]" />
+                              <span>{related.readTime}</span>
+                            </div>
+                            <h4 className="font-bold text-base text-white group-hover:text-[#29ABE2] transition-colors line-clamp-2 mb-3 leading-snug">
+                              {related.title}
+                            </h4>
+                            <p className="text-white/50 text-xs line-clamp-2 mb-6 leading-relaxed">
+                              {related.excerpt}
+                            </p>
+                            <div className="mt-auto flex items-center text-xs font-bold text-[#29ABE2] group-hover:translate-x-1 transition-transform">
+                              READ POST <ArrowRight size={14} className="ml-1" />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+
+
             </div>
           </div>
         </div>
