@@ -1,11 +1,13 @@
 const Project = require('../models/Project');
 const { logActivity } = require('../utils/activityLogger');
 
+const getBaseUrl = (req) => process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
+
 // Create new project
 exports.createProject = async (req, res) => {
     try {
         let { title, category, year, image, link } = req.body;
-        const baseUrl = process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
+        const baseUrl = getBaseUrl(req);
         let fileUrl = null;
 
         // Handle file uploads
@@ -80,6 +82,7 @@ exports.updateProject = async (req, res) => {
         }
 
         let updateData = { ...req.body };
+        const baseUrl = getBaseUrl(req);
 
         // Handle new file uploads
         if (req.files) {
