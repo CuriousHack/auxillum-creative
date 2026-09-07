@@ -4,7 +4,7 @@ import {
   Play, ArrowUpRight, Sparkles,
   Tv, Users, Film, Radio, ArrowRight, MousePointer2, Newspaper, Clock,
   Target, Zap, Palette, Mic2, Megaphone, Video, Share2, Globe, Layout, Camera, Monitor, Music,
-  FileDown, ShieldCheck, Lightbulb, Star, Eye, User, ArrowLeft
+  FileDown, ShieldCheck, Lightbulb, Star, Eye, User, ArrowLeft, Search
 } from 'lucide-react';
 import { api, BlogPost, Service, Project, Resource, SiteSettings, Review } from '../services/api';
 
@@ -29,6 +29,9 @@ export default function LandingPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [works, setWorks] = useState<Project[]>([]);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+  const [showAllPosts, setShowAllPosts] = useState(false);
+  const [blogCategoryFilter, setBlogCategoryFilter] = useState<string>('All');
+  const [blogSearchQuery, setBlogSearchQuery] = useState<string>('');
   const [prDocument, setPrDocument] = useState<Resource | null>(null);
   const [settings, setSettings] = useState<SiteSettings>({ mission: '', vision: '' });
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -93,7 +96,7 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    if (selectedPost) {
+    if (selectedPost || showAllPosts) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -101,7 +104,7 @@ export default function LandingPage() {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [selectedPost]);
+  }, [selectedPost, showAllPosts]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -857,6 +860,7 @@ export default function LandingPage() {
 
           <div className="mt-16 text-center">
             <button
+              onClick={() => setShowAllPosts(true)}
               className="px-8 py-4 border-2 border-white/10 hover:border-[#29ABE2] hover:text-[#29ABE2] transition-all font-bold text-sm tracking-widest uppercase"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
@@ -1075,6 +1079,190 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Full-Screen All Blog Posts List View */}
+      {showAllPosts && (
+        <div
+          id="fullscreen-blog-list-container"
+          className="fixed inset-0 z-[190] bg-zinc-950 text-white overflow-y-auto w-full h-full min-h-screen animate-in fade-in duration-300 flex flex-col"
+        >
+          {/* Sticky Top Navigation Bar */}
+          <div className="sticky top-0 z-50 bg-zinc-950/90 backdrop-blur-xl border-b border-white/10 px-6 py-4 flex items-center justify-between">
+            <button
+              onClick={() => setShowAllPosts(false)}
+              className="flex items-center gap-3 text-white/70 hover:text-[#29ABE2] transition-colors group text-sm font-bold tracking-wider uppercase"
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+            >
+              <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#29ABE2] transition-colors">
+                <ArrowLeft size={16} />
+              </div>
+              <span>Back to Home</span>
+            </button>
+
+            <div className="hidden md:flex items-center gap-3">
+              <span className="text-white/40 text-xs font-bold uppercase tracking-widest">INSIGHTS ARCHIVE</span>
+              <span className="px-2.5 py-0.5 bg-[#29ABE2]/10 border border-[#29ABE2]/30 text-[#29ABE2] text-xs font-bold rounded-full">
+                {blogPosts.length} Articles
+              </span>
+            </div>
+
+            <button
+              onClick={() => setShowAllPosts(false)}
+              className="w-9 h-9 bg-white/10 hover:bg-[#29ABE2] text-white hover:text-black transition-colors rounded-full flex items-center justify-center border border-white/10"
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+              title="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Hero Header for All Insights */}
+          <div className="max-w-[1400px] mx-auto px-6 lg:px-12 pt-12 md:pt-16 pb-8 w-full flex-1">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12 pb-8 border-b border-white/10">
+              <div>
+                <span className="text-[#29ABE2] text-xs font-black tracking-[0.2em] uppercase block mb-3">INSIGHTS & PUBLICATIONS</span>
+                <h1 className="text-4xl md:text-6xl font-black tracking-tight text-white leading-tight">
+                  EXPLORE ALL <span className="text-[#29ABE2]">INSIGHTS</span>
+                </h1>
+              </div>
+              <p className="text-white/60 max-w-xl text-sm md:text-base leading-relaxed">
+                Exploring the intersection of media, technology, and creative storytelling in West Africa. Dive into our complete collection of industry insights and thought leadership.
+              </p>
+            </div>
+
+            {/* Filter & Search Bar */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+              {/* Category Filter Pills */}
+              <div className="flex flex-wrap gap-2">
+                {['All', ...Array.from(new Set(blogPosts.map(p => p.category)))].map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setBlogCategoryFilter(cat)}
+                    className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all rounded-sm border ${
+                      blogCategoryFilter === cat
+                        ? 'bg-[#29ABE2] text-black border-[#29ABE2]'
+                        : 'bg-white/5 text-white/70 border-white/10 hover:border-[#29ABE2]/50 hover:text-white'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* Search Bar */}
+              <div className="relative w-full md:w-80">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search articles..."
+                  value={blogSearchQuery}
+                  onChange={(e) => setBlogSearchQuery(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-sm pl-10 pr-8 py-2.5 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-[#29ABE2] transition-colors"
+                />
+                {blogSearchQuery && (
+                  <button
+                    onClick={() => setBlogSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white text-xs font-bold"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Grid of Blog Posts */}
+            {blogPosts
+              .filter(p => blogCategoryFilter === 'All' || p.category === blogCategoryFilter)
+              .filter(p =>
+                !blogSearchQuery ||
+                p.title.toLowerCase().includes(blogSearchQuery.toLowerCase()) ||
+                p.excerpt?.toLowerCase().includes(blogSearchQuery.toLowerCase()) ||
+                p.category?.toLowerCase().includes(blogSearchQuery.toLowerCase())
+              ).length === 0 ? (
+              <div className="py-20 text-center border border-white/5 bg-white/[0.01] rounded-xl">
+                <p className="text-white/40 text-lg mb-4">No articles found matching your filter criteria.</p>
+                <button
+                  onClick={() => {
+                    setBlogCategoryFilter('All');
+                    setBlogSearchQuery('');
+                  }}
+                  className="px-6 py-2.5 bg-[#29ABE2]/10 border border-[#29ABE2]/30 text-[#29ABE2] text-xs font-bold tracking-widest uppercase hover:bg-[#29ABE2] hover:text-black transition-colors"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                {blogPosts
+                  .filter(p => blogCategoryFilter === 'All' || p.category === blogCategoryFilter)
+                  .filter(p =>
+                    !blogSearchQuery ||
+                    p.title.toLowerCase().includes(blogSearchQuery.toLowerCase()) ||
+                    p.excerpt?.toLowerCase().includes(blogSearchQuery.toLowerCase()) ||
+                    p.category?.toLowerCase().includes(blogSearchQuery.toLowerCase())
+                  )
+                  .map((post) => (
+                    <div
+                      key={post.id}
+                      onClick={() => setSelectedPost(post)}
+                      className="group flex flex-col h-full bg-white/[0.02] border border-white/10 hover:border-[#29ABE2]/40 transition-all duration-500 overflow-hidden cursor-pointer rounded-xl"
+                      onMouseEnter={() => setIsHovering(true)}
+                      onMouseLeave={() => setIsHovering(false)}
+                    >
+                      {/* Image */}
+                      <div className="relative aspect-[16/10] overflow-hidden bg-zinc-900">
+                        <img
+                          src={getImageUrl(post.image)}
+                          alt={post.title}
+                          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                        />
+                        <div className="absolute top-4 left-4">
+                          <span className="px-3 py-1 bg-[#29ABE2] text-black text-[10px] font-bold tracking-widest uppercase rounded-sm">
+                            {post.category}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-8 flex flex-col flex-1">
+                        <div className="flex items-center gap-4 mb-4 text-xs text-white/40 font-medium">
+                          <div className="flex items-center gap-1.5">
+                            <Clock size={12} className="text-[#29ABE2]" />
+                            {post.readTime}
+                          </div>
+                          <span>•</span>
+                          <div>{post.date}</div>
+                        </div>
+
+                        <h3 className="text-xl font-bold mb-4 line-clamp-2 group-hover:text-[#29ABE2] transition-colors leading-snug">
+                          {post.title}
+                        </h3>
+
+                        <p className="text-white/50 text-sm mb-8 line-clamp-3 leading-relaxed">
+                          {post.excerpt}
+                        </p>
+
+                        <div className="mt-auto flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
+                              <Newspaper size={12} className="text-[#29ABE2]" />
+                            </div>
+                            <span className="text-xs font-bold text-white/60 uppercase tracking-wider">{post.author}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs font-bold text-[#29ABE2] group-hover:translate-x-1 transition-transform">
+                            READ ARTICLE <ArrowRight size={14} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Full-Screen Blog Post View */}
       {selectedPost && (
