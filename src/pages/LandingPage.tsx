@@ -13,6 +13,90 @@ const iconMap: Record<string, any> = {
   Megaphone, Video, Share2, Globe, Layout, Camera, Monitor, Music
 };
 
+function FormattedArticleContent({ content }: { content: string }) {
+  if (!content) return null;
+
+  // Normalize line endings
+  const rawText = content.replace(/\r\n/g, '\n').trim();
+
+  // Try splitting by double line breaks first
+  let rawBlocks = rawText.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+
+  // Fallback: If text was entered with single line breaks only
+  if (rawBlocks.length <= 1 && rawText.includes('\n')) {
+    rawBlocks = rawText.split('\n').map(b => b.trim()).filter(Boolean);
+  }
+
+  const formatInlineText = (text: string) => {
+    // Parse **bold** and *italic*
+    const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+        return <strong key={index} className="font-bold text-white">{part.slice(2, -2)}</strong>;
+      }
+      if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+        return <em key={index} className="italic text-zinc-200">{part.slice(1, -1)}</em>;
+      }
+      return part;
+    });
+  };
+
+  return (
+    <div className="space-y-8 text-zinc-300 text-base md:text-lg leading-[1.95] font-normal">
+      {rawBlocks.map((block, index) => {
+        // 1. Markdown Headings or Header Lines
+        if (
+          block.startsWith('#') ||
+          /^(?:[0-9]+\.|\b(?:Section|Step|Chapter|Part|Key Takeaways?|Introduction|Conclusion)\b)/i.test(block) ||
+          (block.length < 80 && block.endsWith(':'))
+        ) {
+          const cleanHeading = block.replace(/^#+\s*/, '');
+          return (
+            <div key={index} className="pt-6 pb-2 border-b border-white/10 mt-10">
+              <h3 className="text-xl md:text-2xl font-black text-white tracking-tight flex items-center gap-3">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#29ABE2] inline-block flex-shrink-0" />
+                <span>{formatInlineText(cleanHeading)}</span>
+              </h3>
+            </div>
+          );
+        }
+
+        // 2. Blockquotes
+        if (block.startsWith('>') || (block.startsWith('"') && block.endsWith('"'))) {
+          const cleanQuote = block.replace(/^>\s*/, '').replace(/^"|"$/g, '');
+          return (
+            <blockquote key={index} className="my-8 bg-white/[0.02] border-l-4 border-[#29ABE2] p-6 md:p-8 rounded-r-xl italic text-lg md:text-xl text-white font-serif shadow-sm">
+              "{formatInlineText(cleanQuote)}"
+            </blockquote>
+          );
+        }
+
+        // 3. Bullet lists (- * • or multiple lines starting with dash)
+        if (block.includes('\n- ') || block.includes('\n* ') || block.includes('\n• ') || block.startsWith('- ') || block.startsWith('* ') || block.startsWith('• ')) {
+          const listItems = block.split('\n').map(l => l.replace(/^[-*•]\s*/, '').trim()).filter(Boolean);
+          return (
+            <ul key={index} className="my-6 space-y-3 bg-white/[0.01] p-6 rounded-xl border border-white/5">
+              {listItems.map((item, i) => (
+                <li key={i} className="flex items-start gap-3 text-zinc-300">
+                  <span className="w-2 h-2 rounded-full bg-[#29ABE2] mt-2.5 flex-shrink-0" />
+                  <span>{formatInlineText(item)}</span>
+                </li>
+              ))}
+            </ul>
+          );
+        }
+
+        // 4. Standard Paragraph
+        return (
+          <p key={index} className="leading-[1.95] text-zinc-300 text-base md:text-lg">
+            {formatInlineText(block)}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -1354,11 +1438,7 @@ export default function LandingPage() {
                 {selectedPost.excerpt}
               </p>
 
-              <div className="text-white/70 space-y-8 leading-[1.9] text-lg font-normal">
-                {selectedPost.content.split('\n\n').map((paragraph, i) => (
-                  <p key={i}>{paragraph}</p>
-                ))}
-              </div>
+              <FormattedArticleContent content={selectedPost.content} />
             </div>
 
             {/* Share / Engagement Bar */}
