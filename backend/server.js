@@ -21,10 +21,13 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 const countVisitors = require('./middleware/countVisitors');
+const { apiRateLimiter } = require('./middleware/rateLimiter');
+
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads')); // Serve uploaded files statically
 app.use(countVisitors); // Count visitors globally
+app.use('/api', apiRateLimiter); // General rate limiting for API endpoints
 
 // Routes
 

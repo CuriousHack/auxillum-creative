@@ -3,8 +3,13 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const userController = require('../controllers/userController');
 const { protect } = require('../middleware/auth');
+const { checkLoginLockout, authRateLimiter } = require('../middleware/rateLimiter');
 
-router.post('/login', authController.login);
+// Apply auth rate limiter globally to authentication endpoints
+router.use(authRateLimiter);
+
+// Login route protected by 5-minute lockout checker
+router.post('/login', checkLoginLockout, authController.login);
 router.post('/forgot-password', authController.forgotPassword);
 router.post('/verify-otp', authController.verifyOtp);
 router.post('/verify-token', authController.verifyToken);

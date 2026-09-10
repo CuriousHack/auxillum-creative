@@ -15,12 +15,22 @@ const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
+const { recordFailedLogin, resetFailedLogin } = require('../middleware/rateLimiter');
+
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        if (!email || !password) {
+            return recordFailedLogin(req, res, 'Email and password are required.');
+        }
+
         const user = await User.findOne({ where: { email } });
 
         if (user && (await user.comparePassword(password))) {
+            // Reset failed login tracking on success
+            resetFailedLogin(req);
+
             res.json({
                 message: 'Login successful',
                 data: {
@@ -37,9 +47,11 @@ exports.login = async (req, res) => {
                 }
             });
         } else {
-            res.status(401).json({ message: 'Invalid email or password' });
+            // Record failed attempt (triggers 5-min lockout on 5th failure)
+            return recordFailedLogin(req, res);
         }
     } catch (error) {
+        console.error('Login error:', error);
         res.status(500).json({ message: 'Server error during login' });
     }
 };
