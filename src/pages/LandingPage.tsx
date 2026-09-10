@@ -54,7 +54,7 @@ function FormattedArticleContent({ content }: { content: string }) {
           return (
             <div key={index} className="pt-6 pb-2 border-b border-white/10 mt-10">
               <h3 className="text-xl md:text-2xl font-black text-white tracking-tight flex items-center gap-3">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#29ABE2] inline-block flex-shrink-0" />
+                <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] inline-block flex-shrink-0" />
                 <span>{formatInlineText(cleanHeading)}</span>
               </h3>
             </div>
@@ -65,7 +65,7 @@ function FormattedArticleContent({ content }: { content: string }) {
         if (block.startsWith('>') || (block.startsWith('"') && block.endsWith('"'))) {
           const cleanQuote = block.replace(/^>\s*/, '').replace(/^"|"$/g, '');
           return (
-            <blockquote key={index} className="my-8 bg-white/[0.02] border-l-4 border-[#29ABE2] p-6 md:p-8 rounded-r-xl italic text-lg md:text-xl text-white font-serif shadow-sm">
+            <blockquote key={index} className="my-8 bg-gradient-to-r from-[#D4AF37]/10 via-white/[0.02] to-transparent border-l-4 border-[#D4AF37] p-6 md:p-8 rounded-r-xl italic text-lg md:text-xl text-white font-serif shadow-sm">
               "{formatInlineText(cleanQuote)}"
             </blockquote>
           );
@@ -78,7 +78,7 @@ function FormattedArticleContent({ content }: { content: string }) {
             <ul key={index} className="my-6 space-y-3 bg-white/[0.01] p-6 rounded-xl border border-white/5">
               {listItems.map((item, i) => (
                 <li key={i} className="flex items-start gap-3 text-zinc-300">
-                  <span className="w-2 h-2 rounded-full bg-[#29ABE2] mt-2.5 flex-shrink-0" />
+                  <span className="w-2 h-2 rounded-full bg-[#D4AF37] mt-2.5 flex-shrink-0" />
                   <span>{formatInlineText(item)}</span>
                 </li>
               ))}
@@ -301,7 +301,7 @@ export default function LandingPage() {
                   !settings.logo.showMobile ? 'block lg:hidden' :
                     !settings.logo.showDesktop ? 'hidden lg:block' : 'hidden'
                 }`}>
-                AUXIL<span className="text-[#29ABE2]">UM</span>
+                AUXIL<span className="bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] bg-clip-text text-transparent">UM</span>
               </span>
             </a>
 
@@ -324,7 +324,7 @@ export default function LandingPage() {
                 >
                   {item.label.toUpperCase()}
                   {activeSection === item.id && (
-                    <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-[#29ABE2]" />
+                    <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-[#29ABE2] to-[#D4AF37]" />
                   )}
                 </a>
               ))}
@@ -342,7 +342,7 @@ export default function LandingPage() {
               </button>
               <a
                 href="#contact"
-                className="group relative px-6 py-3 bg-[#29ABE2] text-black font-bold text-sm tracking-wide overflow-hidden"
+                className="group relative px-6 py-3 bg-gradient-to-r from-[#29ABE2] via-[#29ABE2] to-[#D4AF37] text-black font-bold text-sm tracking-wide overflow-hidden rounded-sm shadow-md"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
@@ -420,14 +420,14 @@ export default function LandingPage() {
 
         {/* Content */}
         <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 border border-[#29ABE2]/30 rounded-full mb-8">
-            <Sparkles className="w-4 h-4 text-[#29ABE2]" />
-            <span className="text-sm font-medium text-[#29ABE2]">CREATIVE MEDIA AGENCY</span>
+          <div className="inline-flex items-center gap-2 px-5 py-2 border border-[#D4AF37]/40 bg-gradient-to-r from-[#29ABE2]/10 via-black to-[#D4AF37]/10 rounded-full mb-8 shadow-[0_0_20px_rgba(212,175,55,0.15)]">
+            <Sparkles className="w-4 h-4 text-[#D4AF37]" />
+            <span className="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] via-cyan-300 to-[#D4AF37] tracking-[0.2em]">CREATIVE MEDIA AGENCY</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl lg:text-[120px] font-black leading-[0.9] tracking-tighter mb-8 max-w-6xl mx-auto uppercase">
             {heroTitleWords.length > 0 && <span className="block">{heroTitleWords.join(' ')}</span>}
-            {heroLastWord && <span className="block text-[#29ABE2]">{heroLastWord}</span>}
+            {heroLastWord && <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] via-cyan-300 to-[#D4AF37]">{heroLastWord}</span>}
           </h1>
 
           <p className="max-w-2xl mx-auto text-lg md:text-xl text-white/60 mb-12">
@@ -490,7 +490,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {(settings.stats || []).map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-4xl md:text-5xl font-black text-[#29ABE2] mb-2">{stat.number}</div>
+                <div className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] mb-2">{stat.number}</div>
                 <div className="text-sm text-white/50 font-medium tracking-wide uppercase">{stat.label}</div>
               </div>
             ))}
@@ -503,9 +503,9 @@ export default function LandingPage() {
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <span className="text-[#29ABE2] text-sm font-bold tracking-widest mb-4 block">ABOUT US</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-sm font-bold tracking-widest mb-4 block">ABOUT US</span>
               <h2 className="text-4xl md:text-6xl font-black leading-tight mb-8">
-                WE CREATE <span className="text-[#29ABE2]">EXPERIENCES</span> THAT MATTER
+                WE CREATE <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37]">EXPERIENCES</span> THAT MATTER
               </h2>
               <div className="space-y-6 text-white/60 text-lg">
                 <p>
@@ -518,7 +518,7 @@ export default function LandingPage() {
               <div className="mt-12 flex flex-wrap gap-4">
                 <a
                   href="#contact"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#29ABE2] text-black font-bold text-sm"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#29ABE2] via-[#29ABE2] to-[#D4AF37] text-black font-bold text-sm rounded-sm shadow-md"
                   onMouseEnter={() => setIsHovering(true)}
                   onMouseLeave={() => setIsHovering(false)}
                 >
@@ -538,19 +538,19 @@ export default function LandingPage() {
               </div>
 
               {/* Floating Card */}
-              <div className="absolute -bottom-8 -left-8 bg-[#29ABE2] text-black p-8">
+              <div className="absolute -bottom-8 -left-8 bg-gradient-to-br from-[#29ABE2] to-[#D4AF37] text-black p-8 shadow-2xl">
                 <div className="text-6xl font-black">5+</div>
                 <div className="font-bold mt-2">Years of Excellence</div>
               </div>
 
               {/* Accent Element */}
-              <div className="absolute -top-4 -right-4 w-32 h-32 border-2 border-[#29ABE2]/30" />
+              <div className="absolute -top-4 -right-4 w-32 h-32 border-2 border-[#D4AF37]/40" />
             </div>
           </div>
 
           {/* Timeline */}
           <div className="mt-32">
-            <h3 className="text-2xl font-bold mb-12 text-center">OUR JOURNEY</h3>
+            <h3 className="text-2xl font-bold mb-12 text-center">OUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37]">JOURNEY</span></h3>
             <div className="grid md:grid-cols-4 gap-8">
               {[
                 { year: '2019', title: 'Founded', desc: 'Auxilum Creative Media established by Shine Begho' },
@@ -558,9 +558,9 @@ export default function LandingPage() {
                 { year: '2021', title: 'Star Power', desc: '"Shine with the Stars" celebrity event premiere' },
                 { year: '2022', title: 'Global Reach', desc: 'International partnership with KBS & EBS Korea' }
               ].map((item, index) => (
-                <div key={index} className="relative pl-8 border-l-2 border-white/10 hover:border-[#29ABE2] transition-colors group">
-                  <div className="absolute left-0 top-0 w-4 h-4 -translate-x-[9px] bg-black border-2 border-white/30 group-hover:border-[#29ABE2] group-hover:bg-[#29ABE2] transition-colors" />
-                  <div className="text-[#29ABE2] font-bold text-sm mb-2">{item.year}</div>
+                <div key={index} className="relative pl-8 border-l-2 border-white/10 hover:border-[#D4AF37] transition-colors group">
+                  <div className="absolute left-0 top-0 w-4 h-4 -translate-x-[9px] bg-black border-2 border-white/30 group-hover:border-[#D4AF37] group-hover:bg-[#D4AF37] transition-colors" />
+                  <div className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] font-bold text-sm mb-2">{item.year}</div>
                   <div className="text-xl font-bold mb-2">{item.title}</div>
                   <div className="text-white/50 text-sm">{item.desc}</div>
                 </div>
@@ -577,7 +577,7 @@ export default function LandingPage() {
             <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
               {/* Image & Stats Container */}
               <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#29ABE2]/20 to-purple-600/20 blur-3xl -z-10 group-hover:from-[#29ABE2]/30 group-hover:to-purple-600/30 transition-all duration-700 rounded-full" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#29ABE2]/20 via-[#D4AF37]/15 to-purple-600/20 blur-3xl -z-10 group-hover:from-[#29ABE2]/30 group-hover:to-[#D4AF37]/30 transition-all duration-700 rounded-full" />
                 <div className="relative aspect-[4/5] md:aspect-square lg:aspect-[4/5] rounded-[2.5rem] overflow-hidden border border-white/10">
                   <img
                     src={settings.founder.image || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800"}
@@ -590,15 +590,15 @@ export default function LandingPage() {
 
               {/* Content Container */}
               <div>
-                <span className="flex items-center gap-2 text-[#29ABE2] text-sm font-bold tracking-widest mb-6 uppercase">
-                  <Sparkles size={16} /> Leadership
+                <span className="flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-sm font-bold tracking-widest mb-6 uppercase">
+                  <Sparkles size={16} className="text-[#D4AF37]" /> Leadership
                 </span>
 
                 <h2 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter mb-4">
                   {settings.founder.name.split(' ')[0]} <span className="text-white/40">{settings.founder.name.split(' ').slice(1).join(' ')}</span>
                 </h2>
 
-                <div className="inline-block px-4 py-2 bg-[#29ABE2]/10 border border-[#29ABE2]/30 rounded-full text-[#29ABE2] text-sm font-bold uppercase tracking-widest mb-8">
+                <div className="inline-block px-4 py-2 bg-gradient-to-r from-[#29ABE2]/10 via-black to-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-full text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-sm font-bold uppercase tracking-widest mb-8">
                   {settings.founder.role}
                 </div>
 
@@ -610,7 +610,7 @@ export default function LandingPage() {
                   <div className="mt-12 pt-12 border-t border-white/10 space-y-4">
                     {settings.founder.features.map((feat, idx) => (
                       <div key={idx} className="flex items-center gap-4">
-                        <div className="w-2 h-2 rounded-full bg-[#29ABE2]" />
+                        <div className="w-2 h-2 rounded-full bg-[#D4AF37]" />
                         <div className="text-lg font-medium text-white">{feat}</div>
                       </div>
                     ))}
@@ -627,16 +627,16 @@ export default function LandingPage() {
       <section className="py-32 bg-black border-t border-white/10 relative overflow-hidden">
         {/* Abstract Backgrounds */}
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#29ABE2]/5 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#29ABE2]/5 blur-[100px] rounded-full -translate-x-1/2 translate-y-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#D4AF37]/5 blur-[100px] rounded-full -translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12 relative z-10">
           <div className="text-center mb-20 max-w-3xl mx-auto">
-            <span className="flex items-center justify-center gap-2 text-[#29ABE2] text-sm font-bold tracking-widest mb-4 uppercase">
-              <Sparkles size={16} /> Our Guiding Light
+            <span className="flex items-center justify-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-sm font-bold tracking-widest mb-4 uppercase">
+              <Sparkles size={16} className="text-[#D4AF37]" /> Our Guiding Light
             </span>
             <h2 className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter">
-              WHERE WE ARE <span className="text-[#29ABE2] relative whitespace-nowrap">GOING
-                <div className="absolute -bottom-2 left-0 w-full h-1 bg-[#29ABE2]/30 rounded-full" />
+              WHERE WE ARE <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] relative whitespace-nowrap">GOING
+                <div className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] rounded-full" />
               </span>
             </h2>
           </div>
@@ -645,14 +645,14 @@ export default function LandingPage() {
 
             {/* Mission Card */}
             <div
-              className="relative group p-10 md:p-14 bg-zinc-950/50 backdrop-blur-xl border border-white/5 rounded-[2.5rem] hover:border-[#29ABE2]/30 transition-all duration-500 overflow-hidden"
+              className="relative group p-10 md:p-14 bg-zinc-950/50 backdrop-blur-xl border border-white/5 rounded-[2.5rem] hover:border-[#D4AF37]/40 transition-all duration-500 overflow-hidden"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
             >
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#29ABE2]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-[#29ABE2]/20 transition-colors duration-500 pointer-events-none" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#29ABE2]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-[#D4AF37]/15 transition-colors duration-500 pointer-events-none" />
 
               <div className="flex flex-col h-full relative z-10">
-                <div className="w-16 h-16 bg-black border border-white/10 rounded-2xl flex items-center justify-center text-[#29ABE2] mb-8 shadow-inner shadow-[#29ABE2]/10 group-hover:scale-110 transition-transform duration-500">
+                <div className="w-16 h-16 bg-black border border-[#D4AF37]/30 rounded-2xl flex items-center justify-center text-[#D4AF37] mb-8 shadow-inner shadow-[#D4AF37]/10 group-hover:scale-110 transition-transform duration-500">
                   <Target size={32} />
                 </div>
 
@@ -670,14 +670,14 @@ export default function LandingPage() {
             {/* Vision Card */}
             {settings.vision && (
               <div
-                className="relative group p-10 md:p-14 bg-zinc-950/50 backdrop-blur-xl border border-white/5 rounded-[2.5rem] hover:border-[#29ABE2]/30 transition-all duration-500 overflow-hidden"
+                className="relative group p-10 md:p-14 bg-zinc-950/50 backdrop-blur-xl border border-white/5 rounded-[2.5rem] hover:border-[#D4AF37]/40 transition-all duration-500 overflow-hidden"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 group-hover:bg-[#29ABE2]/10 transition-colors duration-500 pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#D4AF37]/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 group-hover:bg-[#29ABE2]/15 transition-colors duration-500 pointer-events-none" />
 
                 <div className="flex flex-col h-full relative z-10">
-                  <div className="w-16 h-16 bg-[#29ABE2]/10 border border-[#29ABE2]/20 rounded-2xl flex items-center justify-center text-[#29ABE2] mb-8 shadow-[0_0_30px_rgba(41,171,226,0.15)] group-hover:scale-110 transition-transform duration-500">
+                  <div className="w-16 h-16 bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-2xl flex items-center justify-center text-[#D4AF37] mb-8 shadow-[0_0_30px_rgba(212,175,55,0.15)] group-hover:scale-110 transition-transform duration-500">
                     <Eye size={32} />
                   </div>
 
@@ -701,9 +701,9 @@ export default function LandingPage() {
       <section className="py-24 bg-black/50 border-y border-white/10">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="text-center mb-16">
-            <span className="text-[#29ABE2] text-sm font-bold tracking-widest mb-4 block">OUR DNA</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-sm font-bold tracking-widest mb-4 block">OUR DNA</span>
             <h2 className="text-3xl md:text-5xl font-black">
-              CORE <span className="text-[#29ABE2]">VALUES</span>
+              CORE <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37]">VALUES</span>
             </h2>
           </div>
 
@@ -717,11 +717,11 @@ export default function LandingPage() {
             ].map((value, index) => (
               <div
                 key={index}
-                className="group p-6 border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-[#29ABE2]/30 transition-all text-center flex flex-col items-center"
+                className="group p-6 border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-[#D4AF37]/30 transition-all text-center flex flex-col items-center rounded-xl"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
-                <div className="w-16 h-16 rounded-full bg-[#29ABE2]/10 flex items-center justify-center mb-6 text-[#29ABE2] group-hover:scale-110 group-hover:bg-[#29ABE2] group-hover:text-black transition-all">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#29ABE2]/10 to-[#D4AF37]/10 flex items-center justify-center mb-6 text-[#D4AF37] group-hover:scale-110 group-hover:bg-gradient-to-r group-hover:from-[#29ABE2] group-hover:to-[#D4AF37] group-hover:text-black transition-all">
                   <value.icon className="w-8 h-8" />
                 </div>
                 <h3 className="text-lg font-bold mb-3">{value.title}</h3>
@@ -736,9 +736,9 @@ export default function LandingPage() {
       <section id="services" className="py-32 bg-gradient-to-b from-black to-zinc-950">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="text-center mb-20">
-            <span className="text-[#29ABE2] text-sm font-bold tracking-widest mb-4 block">WHAT WE DO</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-sm font-bold tracking-widest mb-4 block">WHAT WE DO</span>
             <h2 className="text-4xl md:text-6xl font-black">
-              OUR <span className="text-[#29ABE2]">SERVICES</span>
+              OUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37]">SERVICES</span>
             </h2>
           </div>
 
@@ -748,21 +748,20 @@ export default function LandingPage() {
               return (
                 <div
                   key={service.id}
-                  className="group relative p-8 md:p-12 border border-white/10 hover:border-[#29ABE2]/50 bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-500"
+                  className="group relative p-8 md:p-12 border border-white/10 hover:border-[#D4AF37]/40 bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-500 rounded-xl"
                   onMouseEnter={() => setIsHovering(true)}
                   onMouseLeave={() => setIsHovering(false)}
                 >
                   {/* Number */}
-                  <div className="absolute top-8 right-8 text-6xl font-black text-white/5 group-hover:text-[#29ABE2]/10 transition-colors">
+                  <div className="absolute top-8 right-8 text-6xl font-black text-white/5 group-hover:text-[#D4AF37]/20 transition-colors">
                     0{index + 1}
                   </div>
 
                   <div className="relative z-10">
-                    <div className="text-[#29ABE2] mb-6">
-                      <Icon className="w-10 h-10" />
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-[#29ABE2]/10 to-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center mb-6 text-[#D4AF37] group-hover:bg-gradient-to-r group-hover:from-[#29ABE2] group-hover:to-[#D4AF37] group-hover:text-black transition-all duration-300">
+                      <Icon className="w-7 h-7" />
                     </div>
-                    {/* <div className="text-xs font-bold text-white/40 tracking-widest mb-2 uppercase">Core Service</div> */}
-                    <p className="text-xs font-bold text-[#29ABE2] tracking-widest mb-4">{service.subtitle.toUpperCase()}</p>
+                    <p className="text-xs font-bold text-[#D4AF37] tracking-widest mb-4 uppercase">{service.subtitle}</p>
 
                     <h3 className="text-2xl md:text-3xl font-bold mb-4">{service.title}</h3>
                     <p className="text-white/50 mb-6">{service.description}</p>
@@ -770,14 +769,14 @@ export default function LandingPage() {
                     <div className="space-y-2">
                       {service.features.map((feature, i) => (
                         <div key={i} className="flex items-center gap-2 text-xs text-white/40">
-                          <div className="w-1 h-1 rounded-full bg-[#29ABE2]" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-[#29ABE2] to-[#D4AF37]" />
                           {feature}
                         </div>
                       ))}
                     </div>
 
-                    <a href="#contact" className="inline-flex items-center gap-2 mt-8 text-[#29ABE2] font-bold text-sm group-hover:gap-4 transition-all">
-                      GET STARTED <ArrowRight className="w-4 h-4" />
+                    <a href="#contact" className="inline-flex items-center gap-2 mt-8 text-[#29ABE2] group-hover:text-[#D4AF37] font-bold text-sm group-hover:gap-4 transition-all">
+                      GET STARTED <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
                     </a>
                   </div>
                 </div>
@@ -792,14 +791,14 @@ export default function LandingPage() {
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-16">
             <div>
-              <span className="text-[#29ABE2] text-sm font-bold tracking-widest mb-4 block">PORTFOLIO</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-sm font-bold tracking-widest mb-4 block">PORTFOLIO</span>
               <h2 className="text-4xl md:text-6xl font-black">
-                SELECTED <span className="text-[#29ABE2]">WORK</span>
+                SELECTED <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37]">WORK</span>
               </h2>
             </div>
             <a
               href="#contact"
-              className="inline-flex items-center gap-2 text-white/60 hover:text-[#29ABE2] transition-colors font-medium"
+              className="inline-flex items-center gap-2 text-white/60 hover:text-[#D4AF37] transition-colors font-medium"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
             >
@@ -818,7 +817,7 @@ export default function LandingPage() {
                     window.open(work.link, '_blank', 'noopener,noreferrer');
                   }
                 }}
-                className={`group relative aspect-[4/3] overflow-hidden ${work.link || work.fileUrl ? 'cursor-pointer' : 'cursor-default'}`}
+                className={`group relative aspect-[4/3] overflow-hidden rounded-xl border border-white/5 hover:border-[#D4AF37]/30 transition-all duration-500 ${work.link || work.fileUrl ? 'cursor-pointer' : 'cursor-default'}`}
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
@@ -833,13 +832,13 @@ export default function LandingPage() {
                 <div className="absolute inset-0 p-8 flex flex-col justify-end">
                   <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform">
                     <div className="flex items-center gap-4 mb-3">
-                      <span className="text-xs font-bold text-[#29ABE2] tracking-widest uppercase">{work.category}</span>
+                      <span className="text-xs font-bold text-[#D4AF37] tracking-widest uppercase">{work.category}</span>
                       <span className="text-xs text-white/40">{work.year}</span>
                     </div>
                     <h3 className="text-2xl font-bold mb-4">{work.title}</h3>
                     {(work.link || work.fileUrl) && (
-                      <div className="flex items-center gap-2 text-sm font-medium text-white/60 group-hover:text-[#29ABE2] transition-colors">
-                        {work.fileUrl ? 'VIEW ATTACHMENT' : 'VIEW PROJECT'} <ArrowUpRight className="w-4 h-4" />
+                      <div className="flex items-center gap-2 text-sm font-medium text-white/60 group-hover:text-[#D4AF37] transition-colors">
+                        {work.fileUrl ? 'VIEW ATTACHMENT' : 'VIEW PROJECT'} <ArrowUpRight className="w-4 h-4 text-[#D4AF37]" />
                       </div>
                     )}
                   </div>
@@ -858,7 +857,7 @@ export default function LandingPage() {
               {client.type === 'image' ? (
                 <img src={getImageUrl(client.value)} alt="Client Logo" className="h-12 md:h-16 w-auto object-contain filter grayscale hover:grayscale-0 transition-all duration-300" />
               ) : (
-                <span className="text-4xl md:text-6xl font-black text-white hover:text-[#29ABE2] transition-colors cursor-default uppercase">
+                <span className="text-4xl md:text-6xl font-black text-white hover:text-[#D4AF37] transition-colors cursor-default uppercase">
                   {client.value}
                 </span>
               )}
@@ -872,9 +871,9 @@ export default function LandingPage() {
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-16">
             <div>
-              <span className="text-[#29ABE2] text-sm font-bold tracking-widest mb-4 block">INSIGHTS</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-sm font-bold tracking-widest mb-4 block">INSIGHTS</span>
               <h2 className="text-4xl md:text-6xl font-black">
-                LATEST <span className="text-[#29ABE2]">ARTICLES</span>
+                LATEST <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37]">ARTICLES</span>
               </h2>
             </div>
             <div className="flex gap-4">
@@ -889,7 +888,7 @@ export default function LandingPage() {
               <div
                 key={post.id}
                 onClick={() => setSelectedPost(post)}
-                className="group flex flex-col h-full bg-white/[0.02] border border-white/5 hover:border-[#29ABE2]/30 transition-all duration-500 overflow-hidden cursor-pointer"
+                className="group flex flex-col h-full bg-white/[0.02] border border-white/5 hover:border-[#D4AF37]/30 transition-all duration-500 overflow-hidden cursor-pointer rounded-xl"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
@@ -901,7 +900,7 @@ export default function LandingPage() {
                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 bg-[#29ABE2] text-black text-[10px] font-bold tracking-widest uppercase">
+                    <span className="px-3 py-1 bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-black text-[10px] font-extrabold tracking-widest uppercase rounded-sm">
                       {post.category}
                     </span>
                   </div>
@@ -911,14 +910,14 @@ export default function LandingPage() {
                 <div className="p-8 flex flex-col flex-1">
                   <div className="flex items-center gap-4 mb-4 text-xs text-white/40 font-medium">
                     <div className="flex items-center gap-1.5">
-                      <Clock size={12} className="text-[#29ABE2]" />
+                      <Clock size={12} className="text-[#D4AF37]" />
                       {post.readTime}
                     </div>
                     <span>•</span>
                     <div>{post.date}</div>
                   </div>
 
-                  <h3 className="text-xl font-bold mb-4 line-clamp-2 group-hover:text-[#29ABE2] transition-colors leading-tight">
+                  <h3 className="text-xl font-bold mb-4 line-clamp-2 group-hover:text-[#D4AF37] transition-colors leading-tight">
                     {post.title}
                   </h3>
 
@@ -931,9 +930,9 @@ export default function LandingPage() {
                       <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
                         <Newspaper size={12} className="text-[#29ABE2]" />
                       </div>
-                      <span className="text-xs font-bold text-white/60 uppercase racking-wider">{post.author}</span>
+                      <span className="text-xs font-bold text-white/60 uppercase tracking-wider">{post.author}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#29ABE2] opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#D4AF37] opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
                       READ MORE <ArrowRight size={14} />
                     </div>
                   </div>
@@ -945,7 +944,7 @@ export default function LandingPage() {
           <div className="mt-16 text-center">
             <button
               onClick={() => setShowAllPosts(true)}
-              className="px-8 py-4 border-2 border-white/10 hover:border-[#29ABE2] hover:text-[#29ABE2] transition-all font-bold text-sm tracking-widest uppercase"
+              className="px-8 py-4 bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-black hover:opacity-90 transition-all font-extrabold text-sm tracking-widest uppercase rounded-sm shadow-lg shadow-[#29ABE2]/10"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
             >
@@ -960,9 +959,9 @@ export default function LandingPage() {
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="grid lg:grid-cols-2 gap-16">
             <div>
-              <span className="text-[#29ABE2] text-sm font-bold tracking-widest mb-4 block">GET IN TOUCH</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-sm font-bold tracking-widest mb-4 block">GET IN TOUCH</span>
               <h2 className="text-4xl md:text-6xl font-black mb-8">
-                LET'S CREATE <span className="text-[#29ABE2]">SOMETHING</span> AMAZING
+                LET'S CREATE <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37]">SOMETHING</span> AMAZING
               </h2>
               <p className="text-white/50 text-lg mb-12">
                 Ready to illuminate your brand? We're here to transform your vision into reality.
@@ -971,32 +970,32 @@ export default function LandingPage() {
 
               <div className="space-y-8">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-[#29ABE2]/10 flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-[#29ABE2]" />
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-[#29ABE2]/10 to-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center">
+                    <Mail className="w-5 h-5 text-[#D4AF37]" />
                   </div>
                   <div>
                     <div className="text-sm text-white/40 mb-1">EMAIL</div>
-                    <a href="mailto:Info@auxilumcm.com.ng" className="text-lg font-medium hover:text-[#29ABE2] transition-colors">
+                    <a href="mailto:Info@auxilumcm.com.ng" className="text-lg font-medium hover:text-[#D4AF37] transition-colors">
                       Info@auxilumcm.com.ng
                     </a>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-[#29ABE2]/10 flex items-center justify-center">
-                    <Phone className="w-5 h-5 text-[#29ABE2]" />
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-[#29ABE2]/10 to-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center">
+                    <Phone className="w-5 h-5 text-[#D4AF37]" />
                   </div>
                   <div>
                     <div className="text-sm text-white/40 mb-1">PHONE</div>
-                    <a href="tel:+2348098274185" className="text-lg font-medium hover:text-[#29ABE2] transition-colors">
+                    <a href="tel:+2348098274185" className="text-lg font-medium hover:text-[#D4AF37] transition-colors">
                       08098274185
                     </a>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-[#29ABE2]/10 flex items-center justify-center">
-                    <MapPin className="w-5 h-5 text-[#29ABE2]" />
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-[#29ABE2]/10 to-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center">
+                    <MapPin className="w-5 h-5 text-[#D4AF37]" />
                   </div>
                   <div>
                     <div className="text-sm text-white/40 mb-1">LOCATION</div>
@@ -1005,12 +1004,12 @@ export default function LandingPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-[#29ABE2]/10 flex items-center justify-center">
-                    <Instagram className="w-5 h-5 text-[#29ABE2]" />
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-[#29ABE2]/10 to-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center">
+                    <Instagram className="w-5 h-5 text-[#D4AF37]" />
                   </div>
                   <div>
                     <div className="text-sm text-white/40 mb-1">INSTAGRAM</div>
-                    <a href="https://instagram.com/auxilumcm" target="_blank" rel="noopener noreferrer" className="text-lg font-medium hover:text-[#29ABE2] transition-colors">
+                    <a href="https://instagram.com/auxilumcm" target="_blank" rel="noopener noreferrer" className="text-lg font-medium hover:text-[#D4AF37] transition-colors">
                       @auxilumcm
                     </a>
                   </div>
@@ -1018,11 +1017,11 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="bg-white/[0.02] border border-white/10 p-8 md:p-12">
+            <div className="bg-white/[0.02] border border-white/10 p-8 md:p-12 rounded-xl">
               <h3 className="text-2xl font-bold mb-8">Send a Message</h3>
 
               {status !== 'idle' && feedbackMessage && (
-                <div className={`mb-6 p-4 border ${status === 'success' ? 'bg-[#29ABE2]/10 border-[#29ABE2]/30 text-[#29ABE2]' : 'bg-red-500/10 border-red-500/30 text-red-500'}`}>
+                <div className={`mb-6 p-4 border rounded-lg ${status === 'success' ? 'bg-[#29ABE2]/10 border-[#29ABE2]/30 text-[#29ABE2]' : 'bg-red-500/10 border-red-500/30 text-red-500'}`}>
                   {feedbackMessage}
                 </div>
               )}
@@ -1035,7 +1034,7 @@ export default function LandingPage() {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full bg-transparent border-b border-white/20 py-4 text-white placeholder:text-white/30 focus:border-[#29ABE2] outline-none transition-colors"
+                    className="w-full bg-transparent border-b border-white/20 py-4 text-white placeholder:text-white/30 focus:border-[#D4AF37] outline-none transition-colors"
                   />
                 </div>
                 <div>
@@ -1045,7 +1044,7 @@ export default function LandingPage() {
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full bg-transparent border-b border-white/20 py-4 text-white placeholder:text-white/30 focus:border-[#29ABE2] outline-none transition-colors"
+                    className="w-full bg-transparent border-b border-white/20 py-4 text-white placeholder:text-white/30 focus:border-[#D4AF37] outline-none transition-colors"
                   />
                 </div>
                 <div>
@@ -1054,14 +1053,14 @@ export default function LandingPage() {
                     placeholder="Phone Number"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full bg-transparent border-b border-white/20 py-4 text-white placeholder:text-white/30 focus:border-[#29ABE2] outline-none transition-colors"
+                    className="w-full bg-transparent border-b border-white/20 py-4 text-white placeholder:text-white/30 focus:border-[#D4AF37] outline-none transition-colors"
                   />
                 </div>
                 <div>
                   <select
                     value={formData.service}
                     onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                    className="w-full bg-transparent border-b border-white/20 py-4 text-white/60 focus:border-[#29ABE2] outline-none transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-transparent border-b border-white/20 py-4 text-white/60 focus:border-[#D4AF37] outline-none transition-colors appearance-none cursor-pointer"
                   >
                     <option value="" className="bg-black">Select Service</option>
                     <option value="atl" className="bg-black">ATL & Media Buying</option>
@@ -1078,13 +1077,13 @@ export default function LandingPage() {
                     rows={4}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full bg-transparent border-b border-white/20 py-4 text-white placeholder:text-white/30 focus:border-[#29ABE2] outline-none transition-colors resize-none"
+                    className="w-full bg-transparent border-b border-white/20 py-4 text-white placeholder:text-white/30 focus:border-[#D4AF37] outline-none transition-colors resize-none"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={status === 'submitting'}
-                  className={`w-full py-4 bg-[#29ABE2] text-black font-bold text-sm tracking-wide hover:bg-white transition-colors flex items-center justify-center gap-2 ${status === 'submitting' ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  className={`w-full py-4 bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-black font-extrabold text-sm tracking-wide hover:opacity-90 transition-opacity flex items-center justify-center gap-2 rounded-sm ${status === 'submitting' ? 'opacity-70 cursor-not-allowed' : ''}`}
                   onMouseEnter={() => setIsHovering(true)}
                   onMouseLeave={() => setIsHovering(false)}
                 >
@@ -1101,9 +1100,9 @@ export default function LandingPage() {
         <section className="py-24 bg-zinc-950/50 border-t border-white/10 relative overflow-hidden">
           <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
             <div className="text-center mb-16">
-              <span className="text-[#29ABE2] text-sm font-bold tracking-widest mb-4 block">CLIENT EXPERIENCES</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-sm font-bold tracking-widest mb-4 block">CLIENT EXPERIENCES</span>
               <h2 className="text-3xl md:text-5xl font-black">
-                WHAT THEY <span className="text-[#29ABE2]">SAY</span>
+                WHAT THEY <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37]">SAY</span>
               </h2>
             </div>
 
@@ -1111,19 +1110,19 @@ export default function LandingPage() {
               {reviews.map((review) => (
                 <div
                   key={review.id}
-                  className="min-w-[320px] md:min-w-[400px] snap-center bg-white/[0.02] border border-white/5 hover:border-[#29ABE2]/30 p-8 flex flex-col group transition-colors"
+                  className="min-w-[320px] md:min-w-[400px] snap-center bg-white/[0.02] border border-white/5 hover:border-[#D4AF37]/40 p-8 flex flex-col group transition-all duration-300 rounded-xl"
                   onMouseEnter={() => setIsHovering(true)}
                   onMouseLeave={() => setIsHovering(false)}
                 >
                   <div className="flex gap-1 mb-6">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} size={16} className={star <= review.rating ? "fill-[#29ABE2] text-[#29ABE2]" : "text-white/20"} />
+                      <Star key={star} size={16} className={star <= review.rating ? "fill-[#D4AF37] text-[#D4AF37]" : "text-white/20"} />
                     ))}
                   </div>
                   <p className="text-white/70 text-lg mb-8 italic flex-grow">"{review.comment}"</p>
                   <div className="mt-auto">
                     <div className="font-bold text-white tracking-wide uppercase">{review.name}</div>
-                    <div className="text-xs text-[#29ABE2] font-medium tracking-widest uppercase mt-1">
+                    <div className="text-xs text-[#D4AF37] font-bold tracking-widest uppercase mt-1">
                       {review.role}{review.company ? ` - ${review.company}` : ''}
                     </div>
                   </div>
@@ -1139,7 +1138,7 @@ export default function LandingPage() {
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="text-2xl font-black tracking-tighter">
-              AUXIL<span className="text-[#29ABE2]">UM</span>
+              AUXIL<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37]">UM</span>
             </div>
             <div className="text-white/40 text-sm">
               © {new Date().getFullYear()} Auxilum Creative Media. All rights reserved.
@@ -1149,13 +1148,13 @@ export default function LandingPage() {
                 href="https://instagram.com/auxilumcm"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 border border-white/20 flex items-center justify-center hover:border-[#29ABE2] hover:text-[#29ABE2] transition-colors"
+                className="w-10 h-10 border border-white/20 flex items-center justify-center hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors rounded-lg"
               >
                 <Instagram className="w-4 h-4" />
               </a>
               <a
                 href="mailto:Info@auxilumcm.com.ng"
-                className="w-10 h-10 border border-white/20 flex items-center justify-center hover:border-[#29ABE2] hover:text-[#29ABE2] transition-colors"
+                className="w-10 h-10 border border-white/20 flex items-center justify-center hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors rounded-lg"
               >
                 <Mail className="w-4 h-4" />
               </a>
@@ -1174,11 +1173,11 @@ export default function LandingPage() {
           <div className="sticky top-0 z-50 bg-zinc-950/90 backdrop-blur-xl border-b border-white/10 px-6 py-4 flex items-center justify-between">
             <button
               onClick={() => setShowAllPosts(false)}
-              className="flex items-center gap-3 text-white/70 hover:text-[#29ABE2] transition-colors group text-sm font-bold tracking-wider uppercase"
+              className="flex items-center gap-3 text-white/70 hover:text-[#D4AF37] transition-colors group text-sm font-bold tracking-wider uppercase"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
             >
-              <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#29ABE2] transition-colors">
+              <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#D4AF37] transition-colors">
                 <ArrowLeft size={16} />
               </div>
               <span>Back to Home</span>
@@ -1186,14 +1185,14 @@ export default function LandingPage() {
 
             <div className="hidden md:flex items-center gap-3">
               <span className="text-white/40 text-xs font-bold uppercase tracking-widest">INSIGHTS ARCHIVE</span>
-              <span className="px-2.5 py-0.5 bg-[#29ABE2]/10 border border-[#29ABE2]/30 text-[#29ABE2] text-xs font-bold rounded-full">
+              <span className="px-3 py-1 bg-gradient-to-r from-[#29ABE2]/10 to-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-bold rounded-full">
                 {blogPosts.length} Articles
               </span>
             </div>
 
             <button
               onClick={() => setShowAllPosts(false)}
-              className="w-9 h-9 bg-white/10 hover:bg-[#29ABE2] text-white hover:text-black transition-colors rounded-full flex items-center justify-center border border-white/10"
+              className="w-9 h-9 bg-white/10 hover:bg-gradient-to-r hover:from-[#29ABE2] hover:to-[#D4AF37] text-white hover:text-black transition-colors rounded-full flex items-center justify-center border border-white/10"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
               title="Close"
@@ -1206,9 +1205,9 @@ export default function LandingPage() {
           <div className="max-w-[1400px] mx-auto px-6 lg:px-12 pt-12 md:pt-16 pb-8 w-full flex-1">
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12 pb-8 border-b border-white/10">
               <div>
-                <span className="text-[#29ABE2] text-xs font-black tracking-[0.2em] uppercase block mb-3">INSIGHTS & PUBLICATIONS</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-xs font-black tracking-[0.2em] uppercase block mb-3">INSIGHTS & PUBLICATIONS</span>
                 <h1 className="text-4xl md:text-6xl font-black tracking-tight text-white leading-tight">
-                  EXPLORE ALL <span className="text-[#29ABE2]">INSIGHTS</span>
+                  EXPLORE ALL <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37]">INSIGHTS</span>
                 </h1>
               </div>
               <p className="text-white/60 max-w-xl text-sm md:text-base leading-relaxed">
@@ -1224,10 +1223,10 @@ export default function LandingPage() {
                   <button
                     key={cat}
                     onClick={() => setBlogCategoryFilter(cat)}
-                    className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all rounded-sm border ${
+                    className={`px-4 py-2 text-xs font-extrabold uppercase tracking-wider transition-all rounded-sm border ${
                       blogCategoryFilter === cat
-                        ? 'bg-[#29ABE2] text-black border-[#29ABE2]'
-                        : 'bg-white/5 text-white/70 border-white/10 hover:border-[#29ABE2]/50 hover:text-white'
+                        ? 'bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-black border-transparent shadow-md shadow-[#29ABE2]/20'
+                        : 'bg-white/5 text-white/70 border-white/10 hover:border-[#D4AF37]/50 hover:text-white'
                     }`}
                   >
                     {cat}
@@ -1243,7 +1242,7 @@ export default function LandingPage() {
                   placeholder="Search articles..."
                   value={blogSearchQuery}
                   onChange={(e) => setBlogSearchQuery(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-sm pl-10 pr-8 py-2.5 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-[#29ABE2] transition-colors"
+                  className="w-full bg-white/5 border border-white/10 rounded-sm pl-10 pr-8 py-2.5 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-[#D4AF37] transition-colors"
                 />
                 {blogSearchQuery && (
                   <button
@@ -1272,7 +1271,7 @@ export default function LandingPage() {
                     setBlogCategoryFilter('All');
                     setBlogSearchQuery('');
                   }}
-                  className="px-6 py-2.5 bg-[#29ABE2]/10 border border-[#29ABE2]/30 text-[#29ABE2] text-xs font-bold tracking-widest uppercase hover:bg-[#29ABE2] hover:text-black transition-colors"
+                  className="px-6 py-2.5 bg-gradient-to-r from-[#29ABE2]/10 to-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-bold tracking-widest uppercase hover:bg-gradient-to-r hover:from-[#29ABE2] hover:to-[#D4AF37] hover:text-black transition-colors"
                 >
                   Reset Filters
                 </button>
@@ -1291,7 +1290,7 @@ export default function LandingPage() {
                     <div
                       key={post.id}
                       onClick={() => setSelectedPost(post)}
-                      className="group flex flex-col h-full bg-white/[0.02] border border-white/10 hover:border-[#29ABE2]/40 transition-all duration-500 overflow-hidden cursor-pointer rounded-xl"
+                      className="group flex flex-col h-full bg-white/[0.02] border border-white/10 hover:border-[#D4AF37]/40 transition-all duration-500 overflow-hidden cursor-pointer rounded-xl"
                       onMouseEnter={() => setIsHovering(true)}
                       onMouseLeave={() => setIsHovering(false)}
                     >
@@ -1303,7 +1302,7 @@ export default function LandingPage() {
                           className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                         />
                         <div className="absolute top-4 left-4">
-                          <span className="px-3 py-1 bg-[#29ABE2] text-black text-[10px] font-bold tracking-widest uppercase rounded-sm">
+                          <span className="px-3 py-1 bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-black text-[10px] font-extrabold tracking-widest uppercase rounded-sm">
                             {post.category}
                           </span>
                         </div>
@@ -1313,14 +1312,14 @@ export default function LandingPage() {
                       <div className="p-8 flex flex-col flex-1">
                         <div className="flex items-center gap-4 mb-4 text-xs text-white/40 font-medium">
                           <div className="flex items-center gap-1.5">
-                            <Clock size={12} className="text-[#29ABE2]" />
+                            <Clock size={12} className="text-[#D4AF37]" />
                             {post.readTime}
                           </div>
                           <span>•</span>
                           <div>{post.date}</div>
                         </div>
 
-                        <h3 className="text-xl font-bold mb-4 line-clamp-2 group-hover:text-[#29ABE2] transition-colors leading-snug">
+                        <h3 className="text-xl font-bold mb-4 line-clamp-2 group-hover:text-[#D4AF37] transition-colors leading-snug">
                           {post.title}
                         </h3>
 
@@ -1335,7 +1334,7 @@ export default function LandingPage() {
                             </div>
                             <span className="text-xs font-bold text-white/60 uppercase tracking-wider">{post.author}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-xs font-bold text-[#29ABE2] group-hover:translate-x-1 transition-transform">
+                          <div className="flex items-center gap-2 text-xs font-bold text-[#D4AF37] group-hover:translate-x-1 transition-transform">
                             READ ARTICLE <ArrowRight size={14} />
                           </div>
                         </div>
@@ -1358,30 +1357,30 @@ export default function LandingPage() {
           <div className="sticky top-0 z-50 bg-zinc-950/90 backdrop-blur-xl border-b border-white/10 px-6 py-4 flex items-center justify-between">
             <button
               onClick={() => setSelectedPost(null)}
-              className="flex items-center gap-3 text-white/70 hover:text-[#29ABE2] transition-colors group text-sm font-bold tracking-wider uppercase"
+              className="flex items-center gap-3 text-white/70 hover:text-[#D4AF37] transition-colors group text-sm font-bold tracking-wider uppercase"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
             >
-              <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#29ABE2] transition-colors">
+              <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#D4AF37] transition-colors">
                 <ArrowLeft size={16} />
               </div>
               <span>Back to Insights</span>
             </button>
 
             <div className="hidden md:flex items-center gap-3">
-              <span className="px-3 py-1 bg-[#29ABE2]/10 border border-[#29ABE2]/30 text-[#29ABE2] text-xs font-bold tracking-widest uppercase">
+              <span className="px-3 py-1 bg-gradient-to-r from-[#29ABE2]/10 to-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-bold tracking-widest uppercase rounded-full">
                 {selectedPost.category}
               </span>
               <span className="text-white/30 text-xs">•</span>
               <span className="text-white/50 text-xs font-medium flex items-center gap-1">
-                <Clock size={12} className="text-[#29ABE2]" /> {selectedPost.readTime}
+                <Clock size={12} className="text-[#D4AF37]" /> {selectedPost.readTime}
               </span>
             </div>
 
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setSelectedPost(null)}
-                className="w-9 h-9 bg-white/10 hover:bg-[#29ABE2] text-white hover:text-black transition-colors rounded-full flex items-center justify-center border border-white/10"
+                className="w-9 h-9 bg-white/10 hover:bg-gradient-to-r hover:from-[#29ABE2] hover:to-[#D4AF37] text-white hover:text-black transition-colors rounded-full flex items-center justify-center border border-white/10"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
                 title="Close"
@@ -1405,7 +1404,7 @@ export default function LandingPage() {
           {/* Article Header & Title Details (Directly under hero image) */}
           <div className="w-full max-w-4xl mx-auto px-6 md:px-12 pt-8 md:pt-10">
             <div className="mb-8">
-              <span className="inline-block px-4 py-1.5 bg-[#29ABE2] text-black text-xs font-black tracking-[0.2em] uppercase mb-6 rounded-sm">
+              <span className="inline-block px-4 py-1.5 bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-black text-xs font-extrabold tracking-[0.2em] uppercase mb-6 rounded-sm">
                 {selectedPost.category}
               </span>
 
@@ -1415,14 +1414,14 @@ export default function LandingPage() {
 
               <div className="flex flex-wrap items-center gap-6 text-white/60 text-sm font-medium pb-8 border-b border-white/10">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#29ABE2]/20 border border-[#29ABE2]/40 flex items-center justify-center text-[#29ABE2]">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#29ABE2]/20 to-[#D4AF37]/20 border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37]">
                     <User size={14} />
                   </div>
                   <span className="text-white font-bold tracking-wide uppercase">{selectedPost.author}</span>
                 </div>
                 <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
                 <div className="flex items-center gap-2">
-                  <Clock size={14} className="text-[#29ABE2]" />
+                  <Clock size={14} className="text-[#D4AF37]" />
                   <span>{selectedPost.readTime}</span>
                 </div>
                 <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
@@ -1434,7 +1433,7 @@ export default function LandingPage() {
           {/* Main Article Content */}
           <div className="flex-1 max-w-4xl mx-auto px-6 md:px-12 pb-12 lg:pb-16 w-full">
             <div className="prose prose-invert prose-lg max-w-none">
-              <p className="text-xl md:text-2xl text-white/80 italic mb-12 border-l-4 border-[#29ABE2] pl-6 py-3 bg-white/[0.02] rounded-r-lg leading-relaxed">
+              <p className="text-xl md:text-2xl text-white/80 italic mb-12 border-l-4 border-[#D4AF37] pl-6 py-3 bg-white/[0.02] rounded-r-lg leading-relaxed">
                 {selectedPost.excerpt}
               </p>
 
@@ -1450,13 +1449,13 @@ export default function LandingPage() {
                     href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(selectedPost.title)}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-10 h-10 border border-white/10 hover:border-[#29ABE2] hover:text-[#29ABE2] transition-colors flex items-center justify-center rounded-sm text-white/60"
+                    className="w-10 h-10 border border-white/10 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors flex items-center justify-center rounded-sm text-white/60"
                   >
                     <Share2 size={16} />
                   </a>
                   <a
                     href={`mailto:?subject=${encodeURIComponent(selectedPost.title)}`}
-                    className="w-10 h-10 border border-white/10 hover:border-[#29ABE2] hover:text-[#29ABE2] transition-colors flex items-center justify-center rounded-sm text-white/60"
+                    className="w-10 h-10 border border-white/10 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors flex items-center justify-center rounded-sm text-white/60"
                   >
                     <Mail size={16} />
                   </a>
@@ -1468,7 +1467,7 @@ export default function LandingPage() {
                   const container = document.getElementById('fullscreen-blog-container');
                   if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className="text-xs font-bold text-[#29ABE2] hover:underline flex items-center gap-1 uppercase tracking-widest"
+                className="text-xs font-bold text-[#D4AF37] hover:underline flex items-center gap-1 uppercase tracking-widest"
               >
                 Top of page ↑
               </button>
@@ -1482,7 +1481,7 @@ export default function LandingPage() {
                 <div>
                   <div className="flex items-center justify-between mb-8">
                     <div>
-                      <span className="text-[#29ABE2] text-xs font-bold tracking-widest uppercase block mb-1">CONTINUE READING</span>
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-xs font-bold tracking-widest uppercase block mb-1">CONTINUE READING</span>
                       <h3 className="text-2xl md:text-3xl font-black text-white">RELATED ARTICLES</h3>
                     </div>
                   </div>
@@ -1499,7 +1498,7 @@ export default function LandingPage() {
                             const container = document.getElementById('fullscreen-blog-container');
                             if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
                           }}
-                          className="group bg-white/[0.02] border border-white/10 hover:border-[#29ABE2]/50 transition-all duration-300 overflow-hidden cursor-pointer flex flex-col h-full"
+                          className="group bg-white/[0.02] border border-white/10 hover:border-[#D4AF37]/40 transition-all duration-300 overflow-hidden cursor-pointer flex flex-col h-full rounded-xl"
                           onMouseEnter={() => setIsHovering(true)}
                           onMouseLeave={() => setIsHovering(false)}
                         >
@@ -1510,7 +1509,7 @@ export default function LandingPage() {
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
                             <div className="absolute top-3 left-3">
-                              <span className="px-2.5 py-0.5 bg-[#29ABE2] text-black text-[9px] font-black uppercase tracking-wider">
+                              <span className="px-2.5 py-0.5 bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-black text-[9px] font-extrabold uppercase tracking-wider rounded-sm">
                                 {related.category}
                               </span>
                             </div>
@@ -1518,16 +1517,16 @@ export default function LandingPage() {
 
                           <div className="p-6 flex flex-col flex-1">
                             <div className="flex items-center gap-2 text-xs text-white/40 mb-3">
-                              <Clock size={12} className="text-[#29ABE2]" />
+                              <Clock size={12} className="text-[#D4AF37]" />
                               <span>{related.readTime}</span>
                             </div>
-                            <h4 className="font-bold text-base text-white group-hover:text-[#29ABE2] transition-colors line-clamp-2 mb-3 leading-snug">
+                            <h4 className="font-bold text-base text-white group-hover:text-[#D4AF37] transition-colors line-clamp-2 mb-3 leading-snug">
                               {related.title}
                             </h4>
                             <p className="text-white/50 text-xs line-clamp-2 mb-6 leading-relaxed">
                               {related.excerpt}
                             </p>
-                            <div className="mt-auto flex items-center text-xs font-bold text-[#29ABE2] group-hover:translate-x-1 transition-transform">
+                            <div className="mt-auto flex items-center text-xs font-bold text-[#D4AF37] group-hover:translate-x-1 transition-transform">
                               READ POST <ArrowRight size={14} className="ml-1" />
                             </div>
                           </div>
@@ -1537,8 +1536,6 @@ export default function LandingPage() {
                 </div>
               )}
 
-
-
             </div>
           </div>
         </div>
@@ -1547,7 +1544,7 @@ export default function LandingPage() {
       {/* Client Portal Modal */}
       {showPortal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl" onClick={() => setShowPortal(false)}>
-          <div className="relative w-full max-w-md p-8 md:p-12 bg-zinc-950 border border-white/10" onClick={e => e.stopPropagation()}>
+          <div className="relative w-full max-w-md p-8 md:p-12 bg-zinc-950 border border-white/10 rounded-xl" onClick={e => e.stopPropagation()}>
             <button onClick={() => setShowPortal(false)} className="absolute top-4 right-4 text-white/40 hover:text-white">
               <X className="w-6 h-6" />
             </button>
@@ -1562,21 +1559,21 @@ export default function LandingPage() {
                 type="email"
                 placeholder="Email Address"
                 required
-                className="w-full bg-transparent border-b border-white/20 py-4 text-white placeholder:text-white/30 focus:border-[#29ABE2] outline-none"
+                className="w-full bg-transparent border-b border-white/20 py-4 text-white placeholder:text-white/30 focus:border-[#D4AF37] outline-none transition-colors"
               />
               <input
                 type="password"
                 placeholder="Password"
                 required
-                className="w-full bg-transparent border-b border-white/20 py-4 text-white placeholder:text-white/30 focus:border-[#29ABE2] outline-none"
+                className="w-full bg-transparent border-b border-white/20 py-4 text-white placeholder:text-white/30 focus:border-[#D4AF37] outline-none transition-colors"
               />
-              <button type="submit" className="w-full py-4 bg-[#29ABE2] text-black font-bold">
+              <button type="submit" className="w-full py-4 bg-gradient-to-r from-[#29ABE2] to-[#D4AF37] text-black font-extrabold rounded-sm hover:opacity-90 transition-opacity">
                 LOGIN
               </button>
             </form>
 
             <div className="mt-8 text-center">
-              <a href="#contact" onClick={() => setShowPortal(false)} className="text-sm text-[#29ABE2] hover:underline">
+              <a href="#contact" onClick={() => setShowPortal(false)} className="text-sm text-[#D4AF37] hover:underline font-medium">
                 Request Portal Access
               </a>
             </div>
